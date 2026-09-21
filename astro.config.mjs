@@ -5,5 +5,5 @@ import { defineConfig } from 'astro/config';
 //     プロジェクトページ(username.github.io/repo-name)なら base: '/repo-name' を追加。
 export default defineConfig({
   site: 'https://igreeeen9-design.github.io',
-  base: '/ig-note',
+  base: '/ig-note/',
 });

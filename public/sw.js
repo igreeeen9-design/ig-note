@@ -1,5 +1,5 @@
 const CACHE_NAME = 'oyaji-note-v1';
-const OFFLINE_URLS = ['/'];
+const OFFLINE_URLS = ['/ig-note/'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -30,6 +30,6 @@ self.addEventListener('fetch', (event) => {
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
         return response;
       })
-      .catch(() => caches.match(event.request).then((cached) => cached || caches.match('/')))
+      .catch(() => caches.match(event.request).then((cached) => cached || caches.match('/ig-note/')))
   );
 });

@@ -11,7 +11,7 @@ const { slug, title, date, excerpt } = Astro.props;
 const day = date.getDate();
 const month = date.toLocaleDateString('ja-JP', { month: 'short' });
 ---
-<a class="post-entry" href={`/posts/${slug}/`}>
+<a class="post-entry" href={`${import.meta.env.BASE_URL}posts/${slug}/`}>
   <span class="stamp" aria-hidden="true">
     <span class="day">{day}</span>
     <span class="month">{month}</span>

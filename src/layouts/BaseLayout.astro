@@ -18,8 +18,8 @@ const { title, description = 'オヤジのつぶやき。まあいいか、く�
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href={`${import.meta.env.BASE_URL}favicon.svg`} type="image/svg+xml" />
+    <link rel="manifest" href={`${import.meta.env.BASE_URL}manifest.webmanifest`} />
     <meta name="theme-color" content="#e7e2d3" />
   </head>
   <body>
@@ -30,10 +30,10 @@ const { title, description = 'オヤジのつぶやき。まあいいか、く�
       </main>
       <Footer />
     </div>
-    <script>
+    <script define:vars={{ base: import.meta.env.BASE_URL }}>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(() => {
+          navigator.serviceWorker.register(`${base}sw.js`, { scope: base }).catch(() => {
             // オフライン対応が使えなくても、サイトの表示自体には影響しない
           });
         });
