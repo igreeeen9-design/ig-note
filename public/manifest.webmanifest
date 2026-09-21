@@ -1,6 +1,6 @@
 {
-  "name": "できるかな日記",
-  "short_name": "できるかな日記",
+  "name": "できるかな。",
+  "short_name": "できるかな",
   "description": "気になったことを、とりあえずやってみる記録。",
   "start_url": "/ig-note/",
   "scope": "/ig-note/",

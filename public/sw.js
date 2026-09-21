@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dekirukana-nikki-v1';
+const CACHE_NAME = 'dekirukana-v2';
 const OFFLINE_URLS = ['/ig-note/'];
 
 self.addEventListener('install', (event) => {
