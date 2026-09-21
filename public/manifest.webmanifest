@@ -1,7 +1,7 @@
 {
-  "name": "オヤジのつぶやき",
-  "short_name": "オヤジのつぶやき",
-  "description": "まあいいか、くらいで書いています。",
+  "name": "できるかな日記",
+  "short_name": "できるかな日記",
+  "description": "気になったことを、とりあえずやってみる記録。",
   "start_url": "/ig-note/",
   "scope": "/ig-note/",
   "display": "standalone",

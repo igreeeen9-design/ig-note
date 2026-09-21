@@ -6,7 +6,7 @@ import PostCard from '../components/PostCard.astro';
 const allPosts = await getCollection('posts');
 const posts = allPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
-<BaseLayout title="オヤジのつぶやき">
+<BaseLayout title="できるかな日記">
   <ul class="post-list">
     {posts.map((post) => (
       <li>
