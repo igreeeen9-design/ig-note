@@ -1,0 +1,49 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+
+const dateLabel = post.data.date.toLocaleDateString('ja-JP', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+<BaseLayout title={`${post.data.title} - オヤジのつぶやき`} description={post.data.excerpt}>
+  <article>
+    <header class="post-header">
+      <p class="post-date">{dateLabel}</p>
+      <h1 class="post-title">{post.data.title}</h1>
+    </header>
+
+    {post.data.cover && (
+      <div class="post-cover">
+        <img src={post.data.cover} alt="" loading="lazy" />
+      </div>
+    )}
+
+    <div class="post-body">
+      <Content />
+    </div>
+
+    {post.data.tags.length > 0 && (
+      <ul class="tags">
+        {post.data.tags.map((tag) => (
+          <li class="tag">{tag}</li>
+        ))}
+      </ul>
+    )}
+
+    <a class="back-link" href="/">&larr; 一覧にもどる</a>
+  </article>
+</BaseLayout>

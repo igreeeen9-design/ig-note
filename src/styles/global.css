@@ -1,0 +1,243 @@
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
+
+:root {
+  --paper: #e7e2d3;
+  --paper-line: #d7d0ba;
+  --ink: #2b2620;
+  --ink-soft: #5c554a;
+  --stamp: #a63d2f;
+  --rule: #c9c2ac;
+  --indigo: #3b4a5c;
+  --max-w: 640px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+}
+
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 35px,
+    var(--paper-line) 36px
+  );
+  color: var(--ink);
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  line-height: 1.85;
+  -webkit-font-smoothing: antialiased;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+a {
+  color: var(--indigo);
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  color: var(--stamp);
+}
+
+.wrap {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+/* ヘッダー */
+.site-header {
+  padding: 56px 0 28px;
+}
+
+.site-title {
+  font-family: 'Shippori Mincho', serif;
+  font-weight: 700;
+  font-size: 2rem;
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+
+.site-title a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.site-tagline {
+  margin: 10px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.hand-rule {
+  width: 120px;
+  height: 10px;
+  margin-top: 14px;
+  display: block;
+}
+
+/* 記事一覧 */
+.post-list {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+}
+
+.post-entry {
+  display: flex;
+  gap: 16px;
+  padding: 26px 0;
+  border-bottom: 1px solid var(--rule);
+  text-decoration: none;
+  color: inherit;
+}
+
+.post-entry:first-child {
+  padding-top: 0;
+}
+
+.stamp {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  border: 2px solid var(--stamp);
+  color: var(--stamp);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Shippori Mincho', serif;
+  line-height: 1.1;
+  transform: rotate(-6deg);
+  opacity: 0.85;
+}
+
+.stamp .day {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.stamp .month {
+  font-size: 0.62rem;
+  letter-spacing: 0.05em;
+}
+
+.post-entry-body h2 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.2rem;
+  margin: 2px 0 8px;
+}
+
+.post-entry-body p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+/* 記事本文 */
+.post-header {
+  padding: 40px 0 8px;
+}
+
+.post-date {
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+
+.post-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 1.7rem;
+  margin: 8px 0 0;
+}
+
+.post-cover {
+  margin: 24px 0;
+  position: relative;
+}
+
+.post-cover img {
+  width: 100%;
+  border-radius: 2px;
+  display: block;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+}
+
+.post-cover::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 24px;
+  width: 26px;
+  height: 14px;
+  background: rgba(166, 61, 47, 0.55);
+  transform: rotate(-3deg);
+}
+
+.post-body {
+  font-size: 1rem;
+  max-width: 68ch;
+}
+
+.post-body p {
+  margin: 0 0 1.4em;
+}
+
+.tags {
+  margin-top: 32px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 3px 12px;
+}
+
+.back-link {
+  display: inline-block;
+  margin-top: 48px;
+  font-size: 0.9rem;
+}
+
+/* フッター */
+.site-footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .post-entry {
+    transition: transform 0.15s ease;
+  }
+  .post-entry:hover {
+    transform: translateX(2px);
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--indigo);
+  outline-offset: 3px;
+}
+
+@media (max-width: 420px) {
+  .site-title {
+    font-size: 1.6rem;
+  }
+  .post-entry {
+    gap: 12px;
+  }
+}

@@ -1,0 +1,23 @@
+---
+interface Props {
+  slug: string;
+  title: string;
+  date: Date;
+  excerpt?: string;
+}
+
+const { slug, title, date, excerpt } = Astro.props;
+
+const day = date.getDate();
+const month = date.toLocaleDateString('ja-JP', { month: 'short' });
+---
+<a class="post-entry" href={`/posts/${slug}/`}>
+  <span class="stamp" aria-hidden="true">
+    <span class="day">{day}</span>
+    <span class="month">{month}</span>
+  </span>
+  <span class="post-entry-body">
+    <h2>{title}</h2>
+    {excerpt && <p>{excerpt}</p>}
+  </span>
+</a>
