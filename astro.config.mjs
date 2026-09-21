@@ -4,6 +4,6 @@ import { defineConfig } from 'astro/config';
 // 例: ユーザーページ(username.github.io)ならbaseは不要。
 //     プロジェクトページ(username.github.io/repo-name)なら base: '/repo-name' を追加。
 export default defineConfig({
-  site: 'https://example.github.io',
-  // base: '/repo-name',
+  site: 'https://igreeeen9-design.github.io',
+  base: '/ig-note',
 });
