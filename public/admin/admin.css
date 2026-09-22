@@ -1,0 +1,332 @@
+:root {
+  --paper: #f5f3ec;
+  --ink: #2b2620;
+  --ink-soft: #6b6455;
+  --line: #ddd7c6;
+  --accent: #3b4a5c;
+  --danger: #a63d2f;
+  --draft: #b08a3e;
+  --max-w: 640px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* display:flex/inline-blockを指定した要素でも hidden 属性が必ず効くようにする */
+[hidden] {
+  display: none !important;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+  line-height: 1.7;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.wrap {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 16px 16px 100px;
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+}
+
+h1 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0 20px;
+}
+
+.topbar .back {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.icon-btn {
+  border: none;
+  background: none;
+  font-size: 1.3rem;
+  padding: 6px;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+/* 記事一覧 */
+.post-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.post-list li {
+  border-bottom: 1px solid var(--line);
+}
+
+.post-list a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 4px;
+  text-decoration: none;
+}
+
+.post-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1rem;
+}
+
+.post-meta {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  text-align: right;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 2px 7px;
+  border-radius: 10px;
+  margin-bottom: 3px;
+}
+
+.badge.draft {
+  background: color-mix(in srgb, var(--draft) 18%, transparent);
+  color: var(--draft);
+}
+
+.badge.published {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--ink-soft);
+  padding: 60px 20px;
+  font-size: 0.9rem;
+}
+
+.fab {
+  position: fixed;
+  right: 20px;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-size: 1.7rem;
+  line-height: 1;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+
+/* フォーム共通 */
+.field {
+  margin-bottom: 16px;
+}
+
+.field label {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+}
+
+input[type='text'],
+input[type='password'],
+textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--ink);
+}
+
+input[type='text']:focus,
+input[type='password']:focus,
+textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+.title-input {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.body-textarea {
+  min-height: 45vh;
+  resize: vertical;
+  line-height: 1.8;
+}
+
+/* 編集ツールバー */
+.editor-toolbar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.editor-toolbar button {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+/* プレビュー */
+.preview {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 45vh;
+}
+
+.preview img {
+  max-width: 100%;
+  border-radius: 6px;
+}
+
+/* 下部の操作バー */
+.action-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  gap: 8px;
+}
+
+.action-bar .row {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  max-width: var(--max-w);
+  margin: 0 auto;
+}
+
+button.btn {
+  flex: 1;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 8px;
+  padding: 13px 10px;
+  font-size: 0.92rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+button.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 700;
+}
+
+button.btn.danger {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+button.btn:disabled {
+  opacity: 0.5;
+}
+
+.more-menu {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  justify-content: flex-end;
+}
+
+.more-menu button.btn {
+  flex: none;
+  font-size: 0.82rem;
+  padding: 8px 12px;
+}
+
+/* トークン設定画面 */
+.setup {
+  padding-top: 15vh;
+  text-align: center;
+}
+
+.setup p {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.setup ol {
+  text-align: left;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  padding-left: 1.2em;
+}
+
+.setup ol li {
+  margin-bottom: 6px;
+}
+
+.status {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  min-height: 1.4em;
+  margin-top: 8px;
+}
+
+.status.error {
+  color: var(--danger);
+}
+
+.status.success {
+  color: var(--accent);
+}
+
+.spinner {
+  text-align: center;
+  padding: 60px 0;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}

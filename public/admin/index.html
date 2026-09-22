@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>記事一覧 - 管理画面</title>
+    <link rel="stylesheet" href="./admin.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <div id="setup-view" class="setup" hidden>
+        <h1>管理画面のセットアップ</h1>
+        <p>この管理画面からGitHubリポジトリへ直接保存するため、アクセス用のトークンを一度だけ登録してください。トークンはこの端末のブラウザにのみ保存され、どこにも送信されません。</p>
+        <ol>
+          <li>GitHubで <strong>Settings → Developer settings → Personal access tokens → Fine-grained tokens</strong> を開く</li>
+          <li>「Generate new token」で、Repository access を「Only select repositories」→ <code>ig-note</code> のみを選択</li>
+          <li>Permissions の <strong>Contents</strong> を「Read and write」に設定して発行</li>
+          <li>発行されたトークン(<code>github_pat_...</code>)を下に貼り付けて保存</li>
+        </ol>
+        <div class="field">
+          <label for="token-input">GitHubトークン</label>
+          <input id="token-input" type="password" autocomplete="off" placeholder="github_pat_..." />
+        </div>
+        <button class="btn primary" id="save-token-btn" style="width: 100%">保存してはじめる</button>
+        <p id="setup-status" class="status"></p>
+      </div>
+
+      <div id="list-view" hidden>
+        <div class="topbar">
+          <h1>記事一覧</h1>
+          <button class="icon-btn" id="settings-btn" title="設定" aria-label="設定">⚙️</button>
+        </div>
+        <div id="list-status" class="status"></div>
+        <div id="spinner" class="spinner">読み込み中…</div>
+        <ul class="post-list" id="post-list" hidden></ul>
+        <p class="empty-state" id="empty-state" hidden>まだ記事がありません。右下の「＋」から書いてみましょう。</p>
+      </div>
+
+      <button class="fab" id="new-post-btn" title="新規作成" aria-label="新規作成" hidden>＋</button>
+    </div>
+
+    <script type="module">
+      import { getToken, setToken, clearToken, listPosts, formatDateLabel } from './admin.js';
+
+      const setupView = document.getElementById('setup-view');
+      const listView = document.getElementById('list-view');
+      const tokenInput = document.getElementById('token-input');
+      const setupStatus = document.getElementById('setup-status');
+      const listStatus = document.getElementById('list-status');
+      const spinner = document.getElementById('spinner');
+      const postListEl = document.getElementById('post-list');
+      const emptyState = document.getElementById('empty-state');
+      const newPostBtn = document.getElementById('new-post-btn');
+
+      document.getElementById('save-token-btn').addEventListener('click', () => {
+        const value = tokenInput.value.trim();
+        if (!value) {
+          setupStatus.textContent = 'トークンを入力してください';
+          setupStatus.className = 'status error';
+          return;
+        }
+        setToken(value);
+        init();
+      });
+
+      document.getElementById('settings-btn').addEventListener('click', () => {
+        if (confirm('保存済みのトークンをこの端末から削除しますか？')) {
+          clearToken();
+          init();
+        }
+      });
+
+      newPostBtn.addEventListener('click', () => {
+        location.href = './edit.html';
+      });
+
+      async function init() {
+        const token = getToken();
+        if (!token) {
+          setupView.hidden = false;
+          listView.hidden = true;
+          newPostBtn.hidden = true;
+          return;
+        }
+        setupView.hidden = true;
+        listView.hidden = false;
+        newPostBtn.hidden = false;
+        await loadList();
+      }
+
+      async function loadList() {
+        spinner.hidden = false;
+        postListEl.hidden = true;
+        emptyState.hidden = true;
+        listStatus.textContent = '';
+        try {
+          const posts = await listPosts();
+          spinner.hidden = true;
+          if (posts.length === 0) {
+            emptyState.hidden = false;
+            return;
+          }
+          postListEl.hidden = false;
+          postListEl.innerHTML = '';
+          for (const post of posts) {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = `./edit.html?path=${encodeURIComponent(post.path)}`;
+            a.innerHTML = `
+              <span class="post-title">${escapeHtml(post.title)}</span>
+              <span class="post-meta">
+                <span class="badge ${post.draft ? 'draft' : 'published'}">${post.draft ? '下書き' : '公開中'}</span><br />
+                ${escapeHtml(formatDateLabel(post.date))}
+              </span>
+            `;
+            li.appendChild(a);
+            postListEl.appendChild(li);
+          }
+        } catch (err) {
+          spinner.hidden = true;
+          listStatus.textContent = handleError(err);
+          listStatus.className = 'status error';
+        }
+      }
+
+      function handleError(err) {
+        if (err.status === 401 || err.status === 403) {
+          return 'トークンが無効か権限不足です。⚙️から登録し直してください。';
+        }
+        return `読み込みに失敗しました: ${err.message}`;
+      }
+
+      function escapeHtml(str) {
+        return String(str).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      }
+
+      init();
+    </script>
+  </body>
+</html>

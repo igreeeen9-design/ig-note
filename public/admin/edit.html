@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>記事編集 - 管理画面</title>
+    <link rel="stylesheet" href="./admin.css" />
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="topbar">
+        <a class="back" href="./index.html">← 一覧</a>
+        <span id="draft-indicator" class="badge draft" hidden>下書き</span>
+      </div>
+
+      <div id="loading" class="spinner">読み込み中…</div>
+
+      <div id="editor" hidden>
+        <div class="field">
+          <label for="title-input">タイトル</label>
+          <input id="title-input" type="text" class="title-input" placeholder="タイトルを入力" />
+        </div>
+
+        <div id="edit-area">
+          <div class="editor-toolbar">
+            <button type="button" id="btn-heading">見出し</button>
+            <button type="button" id="btn-bold">太字</button>
+            <button type="button" id="btn-image">画像</button>
+          </div>
+          <div class="field">
+            <label for="body-textarea">本文(Markdown)</label>
+            <textarea id="body-textarea" class="body-textarea" placeholder="本文を書く…"></textarea>
+          </div>
+        </div>
+
+        <div id="preview-area" hidden>
+          <div class="preview" id="preview-content"></div>
+        </div>
+
+        <input type="file" id="file-input" accept="image/*" hidden />
+
+        <p id="edit-status" class="status"></p>
+
+        <div class="more-menu" id="more-menu" hidden>
+          <button type="button" class="btn" id="btn-duplicate">複製</button>
+          <button type="button" class="btn danger" id="btn-delete">削除</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-bar" id="action-bar" hidden>
+      <div class="row">
+        <button type="button" class="btn" id="btn-save-draft">下書き保存</button>
+        <button type="button" class="btn" id="btn-update" hidden>更新を保存</button>
+        <button type="button" class="btn" id="btn-preview-toggle">プレビュー</button>
+        <button type="button" class="btn primary" id="btn-publish">公開する</button>
+        <button type="button" class="btn" id="btn-unpublish" hidden>下書きに戻す</button>
+      </div>
+    </div>
+
+    <script type="module">
+      import {
+        getPost,
+        savePostFile,
+        deletePostFile,
+        uploadImage,
+        buildPostFile,
+        genPostPath,
+        todayISO,
+      } from './admin.js';
+
+      const params = new URLSearchParams(location.search);
+      const initialPath = params.get('path');
+
+      const state = {
+        path: initialPath,
+        sha: null,
+        originalData: {},
+        draft: true,
+        date: todayISO(),
+      };
+
+      const el = (id) => document.getElementById(id);
+      const loading = el('loading');
+      const editor = el('editor');
+      const titleInput = el('title-input');
+      const bodyTextarea = el('body-textarea');
+      const editArea = el('edit-area');
+      const previewArea = el('preview-area');
+      const previewContent = el('preview-content');
+      const editStatus = el('edit-status');
+      const actionBar = el('action-bar');
+      const draftIndicator = el('draft-indicator');
+      const moreMenu = el('more-menu');
+      const fileInput = el('file-input');
+
+      const btnSaveDraft = el('btn-save-draft');
+      const btnUpdate = el('btn-update');
+      const btnPublish = el('btn-publish');
+      const btnUnpublish = el('btn-unpublish');
+      const btnPreviewToggle = el('btn-preview-toggle');
+      const btnDuplicate = el('btn-duplicate');
+      const btnDelete = el('btn-delete');
+      const btnHeading = el('btn-heading');
+      const btnBold = el('btn-bold');
+      const btnImage = el('btn-image');
+
+      let previewing = false;
+      let savedCursorPos = 0;
+
+      async function init() {
+        if (initialPath) {
+          try {
+            const post = await getPost(initialPath);
+            state.sha = post.sha;
+            state.originalData = post.data;
+            state.draft = post.data.draft === 'true';
+            state.date = post.data.date || todayISO();
+            titleInput.value = post.data.title ? unquoteLocal(post.data.title) : '';
+            bodyTextarea.value = post.body;
+          } catch (err) {
+            loading.textContent = `読み込みに失敗しました: ${err.message}`;
+            return;
+          }
+        }
+        loading.hidden = true;
+        editor.hidden = false;
+        actionBar.hidden = false;
+        renderState();
+      }
+
+      function unquoteLocal(raw) {
+        if (raw.startsWith('"') && raw.endsWith('"')) {
+          try {
+            return JSON.parse(raw);
+          } catch {
+            return raw.slice(1, -1);
+          }
+        }
+        return raw;
+      }
+
+      function renderState() {
+        draftIndicator.hidden = !state.draft;
+        btnSaveDraft.hidden = !state.draft;
+        btnPublish.hidden = !state.draft;
+        btnUpdate.hidden = state.draft;
+        btnUnpublish.hidden = state.draft;
+        moreMenu.hidden = !state.path;
+      }
+
+      function setBusy(busy) {
+        for (const b of [btnSaveDraft, btnUpdate, btnPublish, btnUnpublish, btnDuplicate, btnDelete]) {
+          b.disabled = busy;
+        }
+      }
+
+      function setStatus(msg, type = '') {
+        editStatus.textContent = msg;
+        editStatus.className = `status ${type}`;
+      }
+
+      function handleError(err) {
+        if (err.status === 401 || err.status === 403) return 'トークンが無効か権限不足です。一覧の⚙️から登録し直してください。';
+        if (err.status === 409) return '他の場所で更新されています。一覧から開き直してください。';
+        return `失敗しました: ${err.message}`;
+      }
+
+      async function save({ draft, date, message }) {
+        setBusy(true);
+        setStatus('保存中…');
+        try {
+          const content = buildPostFile({
+            originalData: state.originalData,
+            title: titleInput.value,
+            draft,
+            date,
+            body: bodyTextarea.value,
+          });
+          const path = state.path || genPostPath();
+          const res = await savePostFile(path, content, message, state.sha || undefined);
+          state.path = path;
+          state.sha = res.content.sha;
+          state.draft = draft;
+          state.date = date;
+          history.replaceState(null, '', `./edit.html?path=${encodeURIComponent(path)}`);
+          renderState();
+          setStatus(draft ? '下書き保存しました' : '公開しました', 'success');
+        } catch (err) {
+          setStatus(handleError(err), 'error');
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      function titleOrUntitled() {
+        return titleInput.value.trim() || '(無題)';
+      }
+
+      btnSaveDraft.addEventListener('click', () => {
+        save({ draft: true, date: state.date, message: `下書き保存: ${titleOrUntitled()}` });
+      });
+      btnPublish.addEventListener('click', () => {
+        save({ draft: false, date: todayISO(), message: `公開: ${titleOrUntitled()}` });
+      });
+      btnUpdate.addEventListener('click', () => {
+        save({ draft: false, date: state.date, message: `更新: ${titleOrUntitled()}` });
+      });
+      btnUnpublish.addEventListener('click', () => {
+        save({ draft: true, date: state.date, message: `公開を取り下げ: ${titleOrUntitled()}` });
+      });
+
+      btnPreviewToggle.addEventListener('click', () => {
+        previewing = !previewing;
+        editArea.hidden = previewing;
+        previewArea.hidden = !previewing;
+        btnPreviewToggle.textContent = previewing ? '編集に戻る' : 'プレビュー';
+        if (previewing) {
+          const html = window.marked ? window.marked.parse(bodyTextarea.value) : escapeHtml(bodyTextarea.value);
+          previewContent.innerHTML = `<h1>${escapeHtml(titleInput.value)}</h1>${html}`;
+        }
+      });
+
+      btnDuplicate.addEventListener('click', async () => {
+        if (!confirm('この記事を複製して、下書きとして保存しますか？')) return;
+        setBusy(true);
+        setStatus('複製中…');
+        try {
+          const content = buildPostFile({
+            originalData: {},
+            title: `${titleInput.value} のコピー`,
+            draft: true,
+            date: todayISO(),
+            body: bodyTextarea.value,
+          });
+          const newPath = genPostPath();
+          await savePostFile(newPath, content, `複製: ${titleOrUntitled()}`);
+          location.href = `./edit.html?path=${encodeURIComponent(newPath)}`;
+        } catch (err) {
+          setStatus(handleError(err), 'error');
+          setBusy(false);
+        }
+      });
+
+      btnDelete.addEventListener('click', async () => {
+        if (!confirm('この記事を削除します。元に戻せません。よろしいですか？')) return;
+        setBusy(true);
+        setStatus('削除中…');
+        try {
+          await deletePostFile(state.path, state.sha, `削除: ${titleOrUntitled()}`);
+          location.href = './index.html';
+        } catch (err) {
+          setStatus(handleError(err), 'error');
+          setBusy(false);
+        }
+      });
+
+      // ツールバー: Markdown挿入
+      bodyTextarea.addEventListener('keyup', () => (savedCursorPos = bodyTextarea.selectionStart));
+      bodyTextarea.addEventListener('click', () => (savedCursorPos = bodyTextarea.selectionStart));
+
+      btnHeading.addEventListener('click', () => insertAtCursor('\n## '));
+      btnBold.addEventListener('click', () => wrapSelection('**', '**'));
+
+      btnImage.addEventListener('click', () => {
+        savedCursorPos = bodyTextarea.selectionStart;
+        fileInput.click();
+      });
+
+      fileInput.addEventListener('change', async () => {
+        const file = fileInput.files[0];
+        fileInput.value = '';
+        if (!file) return;
+        setBusy(true);
+        try {
+          const url = await uploadImage(file, (msg) => setStatus(msg));
+          insertAtCursor(`\n![](${url})\n`);
+          setStatus('画像を挿入しました', 'success');
+        } catch (err) {
+          setStatus(handleError(err), 'error');
+        } finally {
+          setBusy(false);
+        }
+      });
+
+      function insertAtCursor(text) {
+        const pos = savedCursorPos ?? bodyTextarea.value.length;
+        const value = bodyTextarea.value;
+        bodyTextarea.value = value.slice(0, pos) + text + value.slice(pos);
+        const newPos = pos + text.length;
+        bodyTextarea.focus();
+        bodyTextarea.setSelectionRange(newPos, newPos);
+        savedCursorPos = newPos;
+      }
+
+      function wrapSelection(before, after) {
+        const start = bodyTextarea.selectionStart;
+        const end = bodyTextarea.selectionEnd;
+        const value = bodyTextarea.value;
+        const selected = value.slice(start, end) || '文字';
+        bodyTextarea.value = value.slice(0, start) + before + selected + after + value.slice(end);
+        const newStart = start + before.length;
+        const newEnd = newStart + selected.length;
+        bodyTextarea.focus();
+        bodyTextarea.setSelectionRange(newStart, newEnd);
+        savedCursorPos = newEnd;
+      }
+
+      function escapeHtml(str) {
+        return String(str).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      }
+
+      init();
+    </script>
+  </body>
+</html>
