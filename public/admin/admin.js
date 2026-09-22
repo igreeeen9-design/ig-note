@@ -95,6 +95,7 @@ export async function deletePostFile(path, sha, message) {
   });
 }
 
+// file はFile、または(トリミング後の)Blobのどちらでも可
 export async function uploadImage(file, onProgress) {
   onProgress?.('圧縮中…');
   const blob = await compressImage(file);
@@ -107,6 +108,65 @@ export async function uploadImage(file, onProgress) {
     body: JSON.stringify({ message: `画像を追加: ${filename}`, content: base64, branch: BRANCH }),
   });
   return `${getBasePath()}images/uploads/${filename}`;
+}
+
+// 公開URL(/ig-note/images/uploads/xxx.jpg)から、GitHub上の元画像をBlobとして取得する。
+// 公開サイトのURLはビルド完了まで数十秒〜1分ラグがあるため、
+// 既存記事の画像を編集(トリミング)する際はビルド結果を待たずGitHub上の実体を直接読む。
+export async function fetchRepoImageBlob(publicUrl) {
+  const base = getBasePath();
+  const relative = publicUrl.startsWith(base) ? publicUrl.slice(base.length) : publicUrl.replace(/^\//, '');
+  const path = `public/${relative}`;
+  const file = await gh(`/repos/${OWNER}/${REPO}/contents/${path}?ref=${BRANCH}`);
+  const binary = atob(file.content.replace(/\n/g, ''));
+  const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+  return new Blob([bytes], { type: 'image/jpeg' });
+}
+
+// ---------- 本文内の画像タグの読み書き ----------
+// 画像は <img src="..." data-original="..." style="width:XX%;"> というHTML直書きで本文に埋め込む
+// (Astroはmarkdown内の生HTMLをそのまま公開ページに出力するため)。
+// 過去に挿入された ![](url) 形式(旧仕様)も読み取り専用ではなく編集可能として扱う。
+
+const IMAGE_TAG_RE = /<img\s+[^>]*>|!\[[^\]]*\]\([^)]+\)/g;
+
+export function parseImages(body) {
+  const results = [];
+  IMAGE_TAG_RE.lastIndex = 0;
+  let m;
+  while ((m = IMAGE_TAG_RE.exec(body))) {
+    const raw = m[0];
+    const start = m.index;
+    const end = start + raw.length;
+    if (raw.startsWith('<img')) {
+      const srcMatch = raw.match(/src="([^"]*)"/);
+      const originalMatch = raw.match(/data-original="([^"]*)"/);
+      const widthMatch = raw.match(/width:\s*(\d+)%/);
+      const src = srcMatch ? srcMatch[1] : '';
+      results.push({
+        start,
+        end,
+        raw,
+        src,
+        original: originalMatch ? originalMatch[1] : src,
+        width: widthMatch ? Number(widthMatch[1]) : 100,
+      });
+    } else {
+      const urlMatch = raw.match(/\(([^)]+)\)/);
+      const src = urlMatch ? urlMatch[1] : '';
+      results.push({ start, end, raw, src, original: src, width: 100 });
+    }
+  }
+  return results;
+}
+
+export function buildImageTag({ src, original, width }) {
+  const originalAttr = original && original !== src ? ` data-original="${original}"` : '';
+  return `<img src="${src}"${originalAttr} style="width:${width}%;">`;
+}
+
+export function replaceImageAt(body, start, end, newTag) {
+  return body.slice(0, start) + newTag + body.slice(end);
 }
 
 // ---------- frontmatter の読み書き ----------
@@ -140,6 +200,7 @@ export function unquote(raw) {
 export function excerptFromBody(body) {
   const plain = body
     .replace(/```[\s\S]*?```/g, '')
+    .replace(/<[^>]+>/g, '') // <img ...> など、本文中の生HTMLタグを除去
     .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
     .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
     .replace(/[#*_`>-]/g, '')

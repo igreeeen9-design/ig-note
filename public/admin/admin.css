@@ -210,6 +210,171 @@ textarea:focus {
   cursor: pointer;
 }
 
+/* 本文内の画像一覧 */
+.image-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.image-card {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-start;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: #fff;
+}
+
+.image-thumb {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border-radius: 6px;
+  background: var(--paper);
+}
+
+.image-card-controls {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.size-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.size-btn {
+  border: 1px solid var(--line);
+  background: var(--paper);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 0.8rem;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.size-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 700;
+}
+
+.image-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.image-card-actions .btn {
+  flex: none;
+  font-size: 0.8rem;
+  padding: 7px 10px;
+}
+
+/* トリミングモーダル */
+.crop-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 17, 12, 0.9);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.crop-modal-inner {
+  width: 100%;
+  max-width: 480px;
+}
+
+.crop-stage {
+  position: relative;
+  width: 100%;
+  touch-action: none;
+  line-height: 0;
+  background: #000;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.crop-stage img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.crop-box {
+  position: absolute;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55);
+  touch-action: none;
+  cursor: move;
+}
+
+.crop-handle {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  margin: -15px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--accent);
+  touch-action: none;
+}
+
+.crop-handle[data-handle='nw'] {
+  top: 0;
+  left: 0;
+}
+.crop-handle[data-handle='ne'] {
+  top: 0;
+  right: 0;
+  margin-right: -15px;
+}
+.crop-handle[data-handle='sw'] {
+  bottom: 0;
+  left: 0;
+  margin-bottom: -15px;
+}
+.crop-handle[data-handle='se'] {
+  bottom: 0;
+  right: 0;
+  margin-bottom: -15px;
+  margin-right: -15px;
+}
+
+.crop-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.crop-actions .btn {
+  flex: 1;
+  min-width: 100px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.crop-actions .btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
 /* プレビュー */
 .preview {
   background: #fff;
@@ -220,7 +385,10 @@ textarea:focus {
 }
 
 .preview img {
+  display: block;
   max-width: 100%;
+  height: auto;
+  margin: 1em auto;
   border-radius: 6px;
 }
 
