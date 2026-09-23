@@ -1,13 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
 
 :root {
-  --paper: #ffffff;
-  --ink: #181c22;
-  --ink-soft: #3b414b;
-  --heading: #16305a;
+  --paper: #f5f8fa;
+  --surface: #ffffff;
+  --ink: #1f2b33;
+  --ink-soft: #36414b;
+  --heading: #334a5e;
   --stamp: #c1440e;
-  --rule: #dde1e6;
-  --indigo: #16305a;
+  --rule: #d9e2e8;
+  --indigo: #3c607b;
+  --blue-accent: #6b9fc4;
   --max-w: 640px;
 }
 
@@ -141,6 +143,7 @@ a:hover {
 /* トップページ: PICKUP */
 .featured-card {
   display: block;
+  background-color: var(--surface);
   margin-top: 8px;
   padding: 20px;
   border: 1px solid var(--rule);
@@ -150,7 +153,7 @@ a:hover {
 }
 
 .featured-card:hover {
-  border-color: var(--heading);
+  border-color: var(--blue-accent);
 }
 
 .featured-title {
