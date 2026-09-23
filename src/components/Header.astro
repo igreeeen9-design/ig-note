@@ -9,24 +9,33 @@ const { hero = false } = Astro.props;
 const base = import.meta.env.BASE_URL;
 ---
 <header class={hero ? 'site-header site-header--hero' : 'site-header'}>
-  <div class="site-title-row">
-    <div class="site-title-copy">
-      <h1 class="site-title">
-        <a href={base}>DEKIRUKANA<span class="site-title-dot">.</span></a>
+  {hero ? (
+    <>
+      <h1 class="site-hero-title">
+        <a href={base}>
+          <img
+            class="site-hero-image"
+            src={`${base}images/site/title-banner.png`}
+            width="1672"
+            height="941"
+            alt="DEKIRUKANA. — A Life of Experiments."
+            loading="eager"
+            fetchpriority="high"
+          />
+        </a>
       </h1>
       <p class="site-tagline">48歳から、いろいろやってみる。</p>
+    </>
+  ) : (
+    <div class="site-title-row">
+      <div class="site-title-copy">
+        <h1 class="site-title">
+          <a href={base}>DEKIRUKANA<span class="site-title-dot">.</span></a>
+        </h1>
+        <p class="site-tagline">48歳から、いろいろやってみる。</p>
+      </div>
     </div>
-    {hero && (
-      <img
-        class="site-illustration"
-        src={`${base}images/site/hero-illustration.jpg`}
-        width="1280"
-        height="960"
-        alt="植物や猫に囲まれた机でノートパソコンに向かう人のイラスト"
-        loading="eager"
-      />
-    )}
-  </div>
+  )}
   <SiteNav />
   <svg class="hand-rule" viewBox="0 0 120 10" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <path d="M2 6 Q 20 2, 40 6 T 78 6 T 118 5" fill="none" stroke="#c1440e" stroke-width="2" stroke-linecap="round" />
