@@ -89,7 +89,7 @@ a:hover {
 }
 
 .site-title-copy {
-  flex: 1 1 200px;
+  flex: 0 1 200px;
 }
 
 .site-tagline {
