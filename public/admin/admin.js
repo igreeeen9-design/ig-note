@@ -196,6 +196,19 @@ export function unquote(raw) {
   return raw;
 }
 
+// frontmatterの tags: ["a", "b"] / tags: [] という1行のJSON配列表記を読み取る。
+// 記事がまだtagsを持たない場合や壊れている場合は空配列を返す。
+export function parseTagsValue(raw) {
+  if (!raw) return [];
+  try {
+    const arr = JSON.parse(raw);
+    if (Array.isArray(arr)) return arr.map((t) => String(t)).filter(Boolean);
+  } catch {
+    // 手動編集などでJSONとして壊れている場合は諦めて空扱いにする
+  }
+  return [];
+}
+
 // 記事本文の最初の80文字くらいをプレーンテキスト化して一覧用の抜粋にする
 export function excerptFromBody(body) {
   const plain = body
@@ -210,8 +223,8 @@ export function excerptFromBody(body) {
 }
 
 // 記事1本分のMarkdownファイル本文を組み立てる。
-// 既存のフォーマットにない項目(cover, tagsなど)は originalData から引き継いで壊さない。
-export function buildPostFile({ originalData = {}, title, draft, date, body }) {
+// 既存のフォーマットにない項目(coverなど)は originalData から引き継いで壊さない。
+export function buildPostFile({ originalData = {}, title, draft, date, tags, body }) {
   const data = {};
   data.title = JSON.stringify(title || '');
   data.date = date;
@@ -222,8 +235,12 @@ export function buildPostFile({ originalData = {}, title, draft, date, body }) {
   const excerpt = existingExcerpt || excerptFromBody(body);
   if (excerpt) data.excerpt = JSON.stringify(excerpt);
 
+  // tags: 明示的に渡されなければ既存データから読み直す(後方互換)
+  const tagList = Array.isArray(tags) ? tags : parseTagsValue(originalData.tags);
+  data.tags = `[${tagList.map((t) => JSON.stringify(t)).join(', ')}]`;
+
   for (const key of Object.keys(originalData)) {
-    if (['title', 'date', 'draft', 'excerpt'].includes(key)) continue;
+    if (['title', 'date', 'draft', 'excerpt', 'tags'].includes(key)) continue;
     data[key] = originalData[key];
   }
 

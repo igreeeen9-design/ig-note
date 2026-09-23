@@ -23,6 +23,15 @@
           <input id="title-input" type="text" class="title-input" placeholder="タイトルを入力" />
         </div>
 
+        <div class="field">
+          <label for="tag-input">タグ</label>
+          <div id="tag-list" class="tag-chip-list"></div>
+          <div class="tag-input-row">
+            <input id="tag-input" type="text" placeholder="タグを入力してEnter" />
+            <button type="button" class="btn" id="btn-tag-add">追加</button>
+          </div>
+        </div>
+
         <div id="edit-area">
           <div class="editor-toolbar">
             <button type="button" id="btn-heading">見出し</button>
@@ -96,6 +105,7 @@
         buildImageTag,
         replaceImageAt,
         buildPostFile,
+        parseTagsValue,
         genPostPath,
         todayISO,
       } from './admin.js';
@@ -109,12 +119,16 @@
         originalData: {},
         draft: true,
         date: todayISO(),
+        tags: [],
       };
 
       const el = (id) => document.getElementById(id);
       const loading = el('loading');
       const editor = el('editor');
       const titleInput = el('title-input');
+      const tagInput = el('tag-input');
+      const tagListEl = el('tag-list');
+      const btnTagAdd = el('btn-tag-add');
       const bodyTextarea = el('body-textarea');
       const editArea = el('edit-area');
       const previewArea = el('preview-area');
@@ -158,6 +172,7 @@
             state.draft = post.data.draft === 'true';
             state.date = post.data.date || todayISO();
             titleInput.value = post.data.title ? unquoteLocal(post.data.title) : '';
+            state.tags = parseTagsValue(post.data.tags);
             bodyTextarea.value = post.body;
           } catch (err) {
             loading.textContent = `読み込みに失敗しました: ${err.message}`;
@@ -168,6 +183,7 @@
         editor.hidden = false;
         actionBar.hidden = false;
         renderState();
+        renderTags();
         refreshImageList();
       }
 
@@ -190,6 +206,45 @@
         btnUnpublish.hidden = state.draft;
         moreMenu.hidden = !state.path;
       }
+
+      // ---------- タグ編集 ----------
+
+      function renderTags() {
+        tagListEl.innerHTML = '';
+        state.tags.forEach((tag, i) => {
+          const chip = document.createElement('span');
+          chip.className = 'tag-chip';
+          const label = document.createElement('span');
+          label.textContent = tag;
+          const removeBtn = document.createElement('button');
+          removeBtn.type = 'button';
+          removeBtn.textContent = '×';
+          removeBtn.setAttribute('aria-label', `「${tag}」を削除`);
+          removeBtn.addEventListener('click', () => {
+            state.tags.splice(i, 1);
+            renderTags();
+          });
+          chip.append(label, removeBtn);
+          tagListEl.appendChild(chip);
+        });
+      }
+
+      function addTagFromInput() {
+        const value = tagInput.value.trim();
+        if (!value) return;
+        if (!state.tags.includes(value)) {
+          state.tags.push(value);
+          renderTags();
+        }
+        tagInput.value = '';
+      }
+
+      btnTagAdd.addEventListener('click', addTagFromInput);
+      tagInput.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        addTagFromInput();
+      });
 
       function setBusy(busy) {
         for (const b of [btnSaveDraft, btnUpdate, btnPublish, btnUnpublish, btnDuplicate, btnDelete]) {
@@ -219,6 +274,7 @@
             title: titleInput.value,
             draft,
             date,
+            tags: state.tags,
             body: bodyTextarea.value,
           });
           const path = state.path || genPostPath();
@@ -275,6 +331,7 @@
             title: `${titleInput.value} のコピー`,
             draft: true,
             date: todayISO(),
+            tags: state.tags,
             body: bodyTextarea.value,
           });
           const newPath = genPostPath();
