@@ -150,8 +150,8 @@ a:hover {
   margin-top: 8px;
 }
 
-/* トップページ: ABOUT */
-.about-text {
+/* トップページ: NOW / ABOUT など短文セクション共通 */
+.section-text {
   margin: 8px 0 0;
   color: var(--ink-soft);
   font-size: 0.92rem;
