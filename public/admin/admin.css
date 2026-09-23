@@ -163,6 +163,7 @@ h1 {
 
 input[type='text'],
 input[type='password'],
+input[type='date'],
 textarea {
   width: 100%;
   border: 1px solid var(--line);
@@ -176,6 +177,7 @@ textarea {
 
 input[type='text']:focus,
 input[type='password']:focus,
+input[type='date']:focus,
 textarea:focus {
   outline: 2px solid var(--accent);
   outline-offset: -1px;

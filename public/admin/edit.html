@@ -24,6 +24,11 @@
         </div>
 
         <div class="field">
+          <label for="date-input">公開日</label>
+          <input id="date-input" type="date" />
+        </div>
+
+        <div class="field">
           <label for="tag-input">タグ</label>
           <div id="tag-list" class="tag-chip-list"></div>
           <div class="tag-input-row">
@@ -118,7 +123,6 @@
         sha: null,
         originalData: {},
         draft: true,
-        date: todayISO(),
         tags: [],
       };
 
@@ -126,6 +130,7 @@
       const loading = el('loading');
       const editor = el('editor');
       const titleInput = el('title-input');
+      const dateInput = el('date-input');
       const tagInput = el('tag-input');
       const tagListEl = el('tag-list');
       const btnTagAdd = el('btn-tag-add');
@@ -164,14 +169,15 @@
       let savedCursorPos = 0;
 
       async function init() {
+        dateInput.value = todayISO();
         if (initialPath) {
           try {
             const post = await getPost(initialPath);
             state.sha = post.sha;
             state.originalData = post.data;
             state.draft = post.data.draft === 'true';
-            state.date = post.data.date || todayISO();
             titleInput.value = post.data.title ? unquoteLocal(post.data.title) : '';
+            dateInput.value = post.data.date || todayISO();
             state.tags = parseTagsValue(post.data.tags);
             bodyTextarea.value = post.body;
           } catch (err) {
@@ -269,11 +275,12 @@
         setBusy(true);
         setStatus('保存中…');
         try {
+          const finalDate = date || todayISO();
           const content = buildPostFile({
             originalData: state.originalData,
             title: titleInput.value,
             draft,
-            date,
+            date: finalDate,
             tags: state.tags,
             body: bodyTextarea.value,
           });
@@ -282,7 +289,7 @@
           state.path = path;
           state.sha = res.content.sha;
           state.draft = draft;
-          state.date = date;
+          dateInput.value = finalDate;
           history.replaceState(null, '', `./edit.html?path=${encodeURIComponent(path)}`);
           renderState();
           setStatus(draft ? '下書き保存しました' : '公開しました', 'success');
@@ -298,16 +305,16 @@
       }
 
       btnSaveDraft.addEventListener('click', () => {
-        save({ draft: true, date: state.date, message: `下書き保存: ${titleOrUntitled()}` });
+        save({ draft: true, date: dateInput.value, message: `下書き保存: ${titleOrUntitled()}` });
       });
       btnPublish.addEventListener('click', () => {
-        save({ draft: false, date: todayISO(), message: `公開: ${titleOrUntitled()}` });
+        save({ draft: false, date: dateInput.value, message: `公開: ${titleOrUntitled()}` });
       });
       btnUpdate.addEventListener('click', () => {
-        save({ draft: false, date: state.date, message: `更新: ${titleOrUntitled()}` });
+        save({ draft: false, date: dateInput.value, message: `更新: ${titleOrUntitled()}` });
       });
       btnUnpublish.addEventListener('click', () => {
-        save({ draft: true, date: state.date, message: `公開を取り下げ: ${titleOrUntitled()}` });
+        save({ draft: true, date: dateInput.value, message: `公開を取り下げ: ${titleOrUntitled()}` });
       });
 
       btnPreviewToggle.addEventListener('click', () => {
