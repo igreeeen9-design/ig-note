@@ -5,18 +5,66 @@ import PostCard from '../components/PostCard.astro';
 
 const allPosts = await getCollection('posts', ({ data }) => !data.draft);
 const posts = allPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// PICKUPに固定したい記事があれば、その記事のfrontmatterに featured: true を付ける。
+// 付いていなければ、一番新しい記事が自動でPICKUPになる。
+const featuredPost = posts.find((post) => post.data.featured) ?? posts[0];
+const recentPosts = featuredPost ? posts.filter((post) => post.slug !== featuredPost.slug) : posts;
+
+const tagSet = new Set<string>();
+posts.forEach((post) => post.data.tags.forEach((tag) => tagSet.add(tag)));
+const allTags = Array.from(tagSet);
 ---
 <BaseLayout title="できるかな。">
-  <ul class="post-list">
-    {posts.map((post) => (
-      <li>
-        <PostCard
-          slug={post.slug}
-          title={post.data.title}
-          date={post.data.date}
-          excerpt={post.data.excerpt}
-        />
-      </li>
-    ))}
-  </ul>
+  <section class="intro">
+    <p>
+      49歳になって、いろいろ始めました。<br />
+      草野球、AI、サイト作り、メルカリ。<br />
+      「これ、できるかな？」を実際にやってみる記録です。
+    </p>
+  </section>
+
+  {featuredPost && (
+    <section class="featured">
+      <p class="section-label">PICKUP</p>
+      <a class="featured-card" href={`${import.meta.env.BASE_URL}posts/${featuredPost.slug}/`}>
+        <h2 class="featured-title">{featuredPost.data.title}</h2>
+        {featuredPost.data.excerpt && <p class="featured-excerpt">{featuredPost.data.excerpt}</p>}
+      </a>
+    </section>
+  )}
+
+  <section class="recent-posts">
+    <p class="section-label">最近の記事</p>
+    <ul class="post-list">
+      {recentPosts.map((post) => (
+        <li>
+          <PostCard
+            slug={post.slug}
+            title={post.data.title}
+            date={post.data.date}
+            excerpt={post.data.excerpt}
+          />
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  {allTags.length > 0 && (
+    <section class="category-nav">
+      <p class="section-label">カテゴリ</p>
+      <ul class="tags">
+        {allTags.map((tag) => (
+          <li>
+            <a class="tag" href={`${import.meta.env.BASE_URL}tags/${tag}/`}>{tag}</a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <section class="about">
+    <p class="section-label">ABOUT</p>
+    <p class="about-text">49歳。いろいろ試行錯誤中。</p>
+  </section>
 </BaseLayout>
