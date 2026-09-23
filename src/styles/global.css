@@ -68,26 +68,20 @@ a:hover {
 }
 
 .site-header--hero .site-title {
-  font-size: clamp(1.9rem, 9vw, 3rem);
+  font-size: clamp(1.3rem, 6vw, 3rem);
   letter-spacing: 0.06em;
 }
 
-.site-header--hero .site-header-inner {
+.site-title-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 20px;
-}
-
-.site-header--hero .site-header-main {
-  flex: 1 1 260px;
-  min-width: 0;
+  gap: 6px;
 }
 
 .site-illustration {
   display: block;
-  width: 150px;
-  max-width: 40%;
+  width: clamp(24px, 8vw, 150px);
   height: auto;
   border-radius: 4px;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
