@@ -7,6 +7,7 @@ export const REPO = 'ig-note';
 export const BRANCH = 'main';
 export const POSTS_DIR = 'src/content/posts';
 export const UPLOADS_DIR = 'public/images/uploads';
+export const NOW_PATH = 'src/data/now.txt';
 const API = 'https://api.github.com';
 const TOKEN_KEY = 'ig_note_admin_token';
 
@@ -92,6 +93,22 @@ export async function deletePostFile(path, sha, message) {
   return gh(`/repos/${OWNER}/${REPO}/contents/${path}`, {
     method: 'DELETE',
     body: JSON.stringify({ message, sha, branch: BRANCH }),
+  });
+}
+
+// ---------- 汎用テキストファイルの読み書き(NOWなど、記事以外の短いコンテンツ用) ----------
+
+export async function getTextFile(path) {
+  const file = await gh(`/repos/${OWNER}/${REPO}/contents/${path}?ref=${BRANCH}`);
+  return { path, sha: file.sha, content: base64ToUtf8(file.content) };
+}
+
+export async function saveTextFile(path, content, message, sha) {
+  const body = { message, content: utf8ToBase64(content), branch: BRANCH };
+  if (sha) body.sha = sha;
+  return gh(`/repos/${OWNER}/${REPO}/contents/${path}`, {
+    method: 'PUT',
+    body: JSON.stringify(body),
   });
 }
 

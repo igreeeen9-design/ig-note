@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>NOW編集 - 管理画面</title>
+    <link rel="stylesheet" href="./admin.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="topbar">
+        <a class="back" href="./index.html">← 一覧</a>
+      </div>
+
+      <div id="loading" class="spinner">読み込み中…</div>
+
+      <div id="editor" hidden>
+        <div class="field">
+          <label for="now-textarea">NOW(トップページに表示する近況)</label>
+          <textarea id="now-textarea" class="body-textarea" style="min-height: 20vh" placeholder="最近やっていることを書く…"></textarea>
+          <p class="field-hint">改行ごとに1行としてトップページに表示されます。</p>
+        </div>
+        <p id="edit-status" class="status"></p>
+      </div>
+    </div>
+
+    <div class="action-bar" id="action-bar" hidden>
+      <div class="row">
+        <button type="button" class="btn primary" id="btn-save">保存する</button>
+      </div>
+    </div>
+
+    <script type="module">
+      import { getTextFile, saveTextFile, NOW_PATH } from './admin.js';
+
+      const loading = document.getElementById('loading');
+      const editor = document.getElementById('editor');
+      const textarea = document.getElementById('now-textarea');
+      const editStatus = document.getElementById('edit-status');
+      const actionBar = document.getElementById('action-bar');
+      const btnSave = document.getElementById('btn-save');
+
+      let sha = null;
+
+      function setStatus(msg, type = '') {
+        editStatus.textContent = msg;
+        editStatus.className = `status ${type}`;
+      }
+
+      function handleError(err) {
+        if (err.status === 401 || err.status === 403) return 'トークンが無効か権限不足です。一覧の⚙️から登録し直してください。';
+        if (err.status === 409) return '他の場所で更新されています。ページを開き直してください。';
+        return `失敗しました: ${err.message}`;
+      }
+
+      async function init() {
+        try {
+          const file = await getTextFile(NOW_PATH);
+          sha = file.sha;
+          textarea.value = file.content.trim();
+        } catch (err) {
+          loading.textContent = `読み込みに失敗しました: ${err.message}`;
+          return;
+        }
+        loading.hidden = true;
+        editor.hidden = false;
+        actionBar.hidden = false;
+      }
+
+      btnSave.addEventListener('click', async () => {
+        btnSave.disabled = true;
+        setStatus('保存中…');
+        try {
+          const content = `${textarea.value.trim()}\n`;
+          const res = await saveTextFile(NOW_PATH, content, 'NOWを更新', sha);
+          sha = res.content.sha;
+          setStatus('保存しました', 'success');
+        } catch (err) {
+          setStatus(handleError(err), 'error');
+        } finally {
+          btnSave.disabled = false;
+        }
+      });
+
+      init();
+    </script>
+  </body>
+</html>

@@ -2,6 +2,9 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PostCard from '../components/PostCard.astro';
+import nowTextRaw from '../data/now.txt?raw';
+
+const nowLines = nowTextRaw.trim().split('\n').filter(Boolean);
 
 const allPosts = await getCollection('posts', ({ data }) => !data.draft);
 const posts = allPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
@@ -27,8 +30,12 @@ const allTags = Array.from(tagSet);
   <section class="now">
     <p class="section-label">NOW</p>
     <p class="section-text">
-      最近は、このサイトをせっせと手直し中。<br />
-      まだまだ試行錯誤中です。
+      {nowLines.map((line, i) => (
+        <>
+          {line}
+          {i < nowLines.length - 1 && <br />}
+        </>
+      ))}
     </p>
   </section>
 
