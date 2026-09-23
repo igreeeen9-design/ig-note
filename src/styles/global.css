@@ -1,13 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
 
 :root {
-  --paper: #e7e2d3;
-  --paper-line: #d7d0ba;
-  --ink: #2b2620;
-  --ink-soft: #5c554a;
-  --stamp: #a63d2f;
-  --rule: #c9c2ac;
-  --indigo: #3b4a5c;
+  --paper: #f2e9d8;
+  --paper-line: #e6d9be;
+  --ink: #2a2018;
+  --ink-soft: #4a4136;
+  --heading: #6b3226;
+  --stamp: #93392a;
+  --rule: #8c7a58;
+  --indigo: #2f4256;
   --max-w: 640px;
 }
 
@@ -65,7 +66,7 @@ a:hover {
 }
 
 .site-title a {
-  color: var(--ink);
+  color: var(--heading);
   text-decoration: none;
 }
 
@@ -133,6 +134,7 @@ a:hover {
   font-family: 'Shippori Mincho', serif;
   font-size: 1.2rem;
   margin: 2px 0 8px;
+  color: var(--heading);
 }
 
 .post-entry-body p {
@@ -155,6 +157,7 @@ a:hover {
   font-family: 'Shippori Mincho', serif;
   font-size: 1.7rem;
   margin: 8px 0 0;
+  color: var(--heading);
 }
 
 .post-cover {
@@ -176,7 +179,7 @@ a:hover {
   left: 24px;
   width: 26px;
   height: 14px;
-  background: rgba(166, 61, 47, 0.55);
+  background: rgba(147, 57, 42, 0.55);
   transform: rotate(-3deg);
 }
 
@@ -248,5 +251,12 @@ a:hover {
   }
   .post-entry {
     gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .post-body {
+    font-size: 1.0625rem;
+    line-height: 1.9;
   }
 }
