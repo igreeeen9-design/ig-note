@@ -6,9 +6,14 @@ import Footer from '../components/Footer.astro';
 interface Props {
   title: string;
   description?: string;
+  hero?: boolean;
 }
 
-const { title, description = '49歳から、いろいろやってみる個人サイト「できるかな。」。草野球、AI、サイト作りなど、思いついたことをやってみる記録です。' } = Astro.props;
+const {
+  title,
+  description = '49歳から、いろいろやってみる個人サイト「DEKIRUKANA.」。草野球、AI、サイト作りなど、思いついたことをやってみる記録です。',
+  hero = false,
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -24,7 +29,7 @@ const { title, description = '49歳から、いろいろやってみる個人サ
   </head>
   <body>
     <div class="wrap">
-      <Header />
+      <Header hero={hero} />
       <main>
         <slot />
       </main>

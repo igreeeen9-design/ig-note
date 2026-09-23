@@ -63,6 +63,15 @@ a:hover {
   text-decoration: none;
 }
 
+.site-title-dot {
+  color: var(--stamp);
+}
+
+.site-header--hero .site-title {
+  font-size: clamp(1.9rem, 9vw, 3rem);
+  letter-spacing: 0.06em;
+}
+
 .site-tagline {
   margin: 10px 0 0;
   color: var(--ink-soft);
