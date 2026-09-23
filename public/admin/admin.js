@@ -224,7 +224,7 @@ export function excerptFromBody(body) {
 
 // 記事1本分のMarkdownファイル本文を組み立てる。
 // 既存のフォーマットにない項目(coverなど)は originalData から引き継いで壊さない。
-export function buildPostFile({ originalData = {}, title, draft, date, tags, body }) {
+export function buildPostFile({ originalData = {}, title, draft, date, featured, tags, body }) {
   const data = {};
   data.title = JSON.stringify(title || '');
   data.date = date;
@@ -239,8 +239,12 @@ export function buildPostFile({ originalData = {}, title, draft, date, tags, bod
   const tagList = Array.isArray(tags) ? tags : parseTagsValue(originalData.tags);
   data.tags = `[${tagList.map((t) => JSON.stringify(t)).join(', ')}]`;
 
+  // featured: 明示的に渡されなければ既存データから読み直す(後方互換)
+  const isFeatured = typeof featured === 'boolean' ? featured : originalData.featured === 'true';
+  data.featured = isFeatured ? 'true' : 'false';
+
   for (const key of Object.keys(originalData)) {
-    if (['title', 'date', 'draft', 'excerpt', 'tags'].includes(key)) continue;
+    if (['title', 'date', 'draft', 'excerpt', 'tags', 'featured'].includes(key)) continue;
     data[key] = originalData[key];
   }
 

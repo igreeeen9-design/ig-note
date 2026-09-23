@@ -29,6 +29,14 @@
         </div>
 
         <div class="field">
+          <label class="checkbox-field">
+            <input type="checkbox" id="featured-input" />
+            <span>PICKUPにする(トップページに大きく表示)</span>
+          </label>
+          <p class="field-hint">複数の記事でONにした場合は、公開日が新しい記事が優先されます。</p>
+        </div>
+
+        <div class="field">
           <label for="tag-input">タグ</label>
           <div id="tag-list" class="tag-chip-list"></div>
           <div class="tag-input-row">
@@ -131,6 +139,7 @@
       const editor = el('editor');
       const titleInput = el('title-input');
       const dateInput = el('date-input');
+      const featuredInput = el('featured-input');
       const tagInput = el('tag-input');
       const tagListEl = el('tag-list');
       const btnTagAdd = el('btn-tag-add');
@@ -178,6 +187,7 @@
             state.draft = post.data.draft === 'true';
             titleInput.value = post.data.title ? unquoteLocal(post.data.title) : '';
             dateInput.value = post.data.date || todayISO();
+            featuredInput.checked = post.data.featured === 'true';
             state.tags = parseTagsValue(post.data.tags);
             bodyTextarea.value = post.body;
           } catch (err) {
@@ -281,6 +291,7 @@
             title: titleInput.value,
             draft,
             date: finalDate,
+            featured: featuredInput.checked,
             tags: state.tags,
             body: bodyTextarea.value,
           });
@@ -338,6 +349,7 @@
             title: `${titleInput.value} のコピー`,
             draft: true,
             date: todayISO(),
+            featured: false,
             tags: state.tags,
             body: bodyTextarea.value,
           });
