@@ -72,6 +72,28 @@ a:hover {
   letter-spacing: 0.06em;
 }
 
+.site-header--hero .site-header-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+}
+
+.site-header--hero .site-header-main {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.site-illustration {
+  display: block;
+  width: 150px;
+  max-width: 40%;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+  flex: 0 0 auto;
+}
+
 .site-tagline {
   margin: 10px 0 0;
   color: var(--ink-soft);

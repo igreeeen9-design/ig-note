@@ -6,14 +6,29 @@ interface Props {
 }
 
 const { hero = false } = Astro.props;
+const base = import.meta.env.BASE_URL;
 ---
 <header class={hero ? 'site-header site-header--hero' : 'site-header'}>
-  <h1 class="site-title">
-    <a href={import.meta.env.BASE_URL}>DEKIRUKANA<span class="site-title-dot">.</span></a>
-  </h1>
-  <p class="site-tagline">48歳から、いろいろやってみる。</p>
-  <SiteNav />
-  <svg class="hand-rule" viewBox="0 0 120 10" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <path d="M2 6 Q 20 2, 40 6 T 78 6 T 118 5" fill="none" stroke="#c1440e" stroke-width="2" stroke-linecap="round" />
-  </svg>
+  <div class="site-header-inner">
+    <div class="site-header-main">
+      <h1 class="site-title">
+        <a href={base}>DEKIRUKANA<span class="site-title-dot">.</span></a>
+      </h1>
+      <p class="site-tagline">48歳から、いろいろやってみる。</p>
+      <SiteNav />
+      <svg class="hand-rule" viewBox="0 0 120 10" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M2 6 Q 20 2, 40 6 T 78 6 T 118 5" fill="none" stroke="#c1440e" stroke-width="2" stroke-linecap="round" />
+      </svg>
+    </div>
+    {hero && (
+      <img
+        class="site-illustration"
+        src={`${base}images/site/hero-illustration.jpg`}
+        width="900"
+        height="491"
+        alt="ノートパソコンに向かう人のイラスト"
+        loading="eager"
+      />
+    )}
+  </div>
 </header>
