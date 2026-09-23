@@ -3,14 +3,29 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('posts', ({ data }) => !data.draft);
-  return posts.map((post) => ({
-    params: { slug: post.slug },
-    props: { post },
-  }));
+  const allPosts = await getCollection('posts', ({ data }) => !data.draft);
+  const posts = allPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+  return posts.map((post, index) => {
+    const relatedPosts = posts
+      .filter(
+        (p) => p.slug !== post.slug && p.data.tags.some((tag) => post.data.tags.includes(tag))
+      )
+      .slice(0, 3);
+
+    return {
+      params: { slug: post.slug },
+      props: {
+        post,
+        prevPost: posts[index + 1] ?? null,
+        nextPost: posts[index - 1] ?? null,
+        relatedPosts,
+      },
+    };
+  });
 }
 
-const { post } = Astro.props;
+const { post, prevPost, nextPost, relatedPosts } = Astro.props;
 const { Content } = await post.render();
 
 const dateLabel = post.data.date.toLocaleDateString('ja-JP', {
@@ -39,9 +54,43 @@ const dateLabel = post.data.date.toLocaleDateString('ja-JP', {
     {post.data.tags.length > 0 && (
       <ul class="tags">
         {post.data.tags.map((tag) => (
-          <li class="tag">{tag}</li>
+          <li>
+            <a class="tag" href={`${import.meta.env.BASE_URL}tags/${tag}/`}>{tag}</a>
+          </li>
         ))}
       </ul>
+    )}
+
+    {relatedPosts.length > 0 && (
+      <section class="related-posts">
+        <p class="section-label">関連記事</p>
+        <ul class="related-list">
+          {relatedPosts.map((related) => (
+            <li>
+              <a class="related-link" href={`${import.meta.env.BASE_URL}posts/${related.slug}/`}>
+                {related.data.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    {(prevPost || nextPost) && (
+      <nav class="post-nav" aria-label="前後の記事">
+        {prevPost && (
+          <a class="post-nav-link" href={`${import.meta.env.BASE_URL}posts/${prevPost.slug}/`}>
+            <span class="post-nav-label">&larr; 前の記事</span>
+            <span class="post-nav-title">{prevPost.data.title}</span>
+          </a>
+        )}
+        {nextPost && (
+          <a class="post-nav-link" href={`${import.meta.env.BASE_URL}posts/${nextPost.slug}/`}>
+            <span class="post-nav-label">次の記事 &rarr;</span>
+            <span class="post-nav-title">{nextPost.data.title}</span>
+          </a>
+        )}
+      </nav>
     )}
 
     <a class="back-link" href={import.meta.env.BASE_URL}>&larr; 一覧にもどる</a>

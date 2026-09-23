@@ -1,14 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
 
 :root {
-  --paper: #f2e9d8;
-  --paper-line: #e6d9be;
-  --ink: #2a2018;
-  --ink-soft: #4a4136;
-  --heading: #6b3226;
-  --stamp: #93392a;
-  --rule: #8c7a58;
-  --indigo: #2f4256;
+  --paper: #ffffff;
+  --ink: #20242b;
+  --ink-soft: #4f5561;
+  --heading: #16305a;
+  --stamp: #c1440e;
+  --rule: #dde1e6;
+  --indigo: #16305a;
   --max-w: 640px;
 }
 
@@ -23,12 +22,6 @@ html {
 body {
   margin: 0;
   background-color: var(--paper);
-  background-image: repeating-linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent 35px,
-    var(--paper-line) 36px
-  );
   color: var(--ink);
   font-family: 'Zen Kaku Gothic New', sans-serif;
   line-height: 1.85;
@@ -108,8 +101,8 @@ a:hover {
   width: 52px;
   height: 52px;
   border-radius: 999px;
-  border: 2px solid var(--stamp);
-  color: var(--stamp);
+  border: 2px solid var(--heading);
+  color: var(--heading);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -179,7 +172,7 @@ a:hover {
   left: 24px;
   width: 26px;
   height: 14px;
-  background: rgba(147, 57, 42, 0.55);
+  background: rgba(193, 68, 14, 0.55);
   transform: rotate(-3deg);
 }
 
@@ -202,18 +195,96 @@ a:hover {
 }
 
 .tags {
-  margin-top: 32px;
+  list-style: none;
+  margin: 32px 0 0;
+  padding: 0;
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
 }
 
 .tag {
+  display: inline-block;
   font-size: 0.78rem;
   color: var(--ink-soft);
   border: 1px solid var(--rule);
   border-radius: 999px;
   padding: 3px 12px;
+  text-decoration: none;
+}
+
+.tag:hover,
+.tag:focus-visible {
+  color: var(--heading);
+  border-color: var(--heading);
+}
+
+/* 関連記事 */
+.section-label {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  margin: 40px 0 4px;
+}
+
+.related-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.related-list li {
+  border-bottom: 1px solid var(--rule);
+}
+
+.related-list li:last-child {
+  border-bottom: none;
+}
+
+.related-link {
+  display: block;
+  padding: 12px 0;
+  color: var(--heading);
+  text-decoration: none;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 0.98rem;
+}
+
+.related-link:hover {
+  color: var(--stamp);
+}
+
+/* 前後の記事 */
+.post-nav {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.post-nav-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.post-nav-label {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  margin-bottom: 2px;
+}
+
+.post-nav-title {
+  display: block;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 0.98rem;
+  color: var(--heading);
+}
+
+.post-nav-link:hover .post-nav-title {
+  color: var(--stamp);
 }
 
 .back-link {

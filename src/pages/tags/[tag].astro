@@ -1,0 +1,49 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('posts', ({ data }) => !data.draft);
+
+  const tagSet = new Set<string>();
+  allPosts.forEach((post) => post.data.tags.forEach((tag) => tagSet.add(tag)));
+
+  return Array.from(tagSet).map((tag) => {
+    const posts = allPosts
+      .filter((post) => post.data.tags.includes(tag))
+      .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+    return {
+      params: { tag },
+      props: { tag, posts },
+    };
+  });
+}
+
+const { tag, posts } = Astro.props;
+---
+<BaseLayout
+  title={`${tag} の記事 - できるかな。`}
+  description={`「${tag}」タグが付いた記事の一覧です。`}
+>
+  <header class="post-header">
+    <p class="post-date">タグ</p>
+    <h1 class="post-title">{tag}</h1>
+  </header>
+
+  <ul class="post-list">
+    {posts.map((post) => (
+      <li>
+        <PostCard
+          slug={post.slug}
+          title={post.data.title}
+          date={post.data.date}
+          excerpt={post.data.excerpt}
+        />
+      </li>
+    ))}
+  </ul>
+
+  <a class="back-link" href={import.meta.env.BASE_URL}>&larr; 一覧にもどる</a>
+</BaseLayout>
