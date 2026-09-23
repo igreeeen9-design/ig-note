@@ -81,11 +81,15 @@ a:hover {
 
 .site-illustration {
   display: block;
-  width: clamp(30px, 10vw, 180px);
+  width: clamp(96px, 24vw, 180px);
   height: auto;
   border-radius: 4px;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
   flex: 0 0 auto;
+}
+
+.site-title-copy {
+  flex: 1 1 200px;
 }
 
 .site-tagline {
@@ -423,11 +427,6 @@ a:hover {
 }
 
 @media (max-width: 480px) {
-  /* トップページのみ。タイトルの大きさを保ち、挿絵を少し大きくする。 */
-  .site-header--hero .site-illustration {
-    width: clamp(60px, 17.5vw, 80px);
-  }
-
   .post-body {
     font-size: 1.0625rem;
     line-height: 1.9;
