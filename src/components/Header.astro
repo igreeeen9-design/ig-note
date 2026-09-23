@@ -1,4 +1,6 @@
 ---
+import SiteNav from './SiteNav.astro';
+
 interface Props {
   hero?: boolean;
 }
@@ -10,6 +12,7 @@ const { hero = false } = Astro.props;
     <a href={import.meta.env.BASE_URL}>DEKIRUKANA<span class="site-title-dot">.</span></a>
   </h1>
   <p class="site-tagline">48歳から、いろいろやってみる。</p>
+  <SiteNav />
   <svg class="hand-rule" viewBox="0 0 120 10" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <path d="M2 6 Q 20 2, 40 6 T 78 6 T 118 5" fill="none" stroke="#c1440e" stroke-width="2" stroke-linecap="round" />
   </svg>
