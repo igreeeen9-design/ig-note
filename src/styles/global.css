@@ -81,7 +81,7 @@ a:hover {
 
 .site-illustration {
   display: block;
-  width: clamp(24px, 8vw, 150px);
+  width: clamp(30px, 10vw, 180px);
   height: auto;
   border-radius: 4px;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
@@ -425,7 +425,7 @@ a:hover {
 @media (max-width: 480px) {
   /* トップページのみ。タイトルの大きさを保ち、挿絵を少し大きくする。 */
   .site-header--hero .site-illustration {
-    width: clamp(48px, 14vw, 64px);
+    width: clamp(60px, 17.5vw, 80px);
   }
 
   .post-body {
