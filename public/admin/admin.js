@@ -247,9 +247,8 @@ export function buildPostFile({ originalData = {}, title, draft, date, featured,
   data.date = date;
   data.draft = draft ? 'true' : 'false';
 
-  // 抜粋: 既に手動で書かれているものがあれば尊重し、新規記事のみ自動生成する
-  const existingExcerpt = originalData.excerpt ? unquote(originalData.excerpt) : '';
-  const excerpt = existingExcerpt || excerptFromBody(body);
+  // 新規・既存記事とも、保存時点の本文から抜粋を再生成する。
+  const excerpt = excerptFromBody(body);
   if (excerpt) data.excerpt = JSON.stringify(excerpt);
 
   // tags: 明示的に渡されなければ既存データから読み直す(後方互換)
