@@ -8,7 +8,29 @@
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "icons": [
-    { "src": "/ig-note/icons/dekirukana-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/ig-note/icons/dekirukana-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+    {
+      "src": "/ig-note/icons/dekirukana-large-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/ig-note/icons/dekirukana-large-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/ig-note/icons/dekirukana-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/ig-note/icons/dekirukana-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }
