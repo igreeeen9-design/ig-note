@@ -86,18 +86,27 @@ const base = import.meta.env.BASE_URL;
           headers: { Accept: 'application/json' },
           signal: controller.signal,
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) {
+          // Formspreeは失敗理由をJSONの errors で返す(原因調査用にコンソールへ出す)
+          const detail = await res.json().catch(() => null);
+          console.warn('Formspree送信エラー', res.status, detail);
+          throw new Error(`HTTP ${res.status}`);
+        }
 
+        form.reset();
         form.hidden = true;
         thanks.hidden = false;
         thanks.focus();
-      } catch {
+      } catch (error) {
+        // 通信エラー・タイムアウト・Formspreeのエラー応答のいずれも、ここで表示する。
         // 入力内容はそのまま残し、もう一度送れるようにする
+        console.warn('お問い合わせの送信に失敗しました', error);
         status.textContent = '送信できませんでした。時間をおいて、もう一度お試しください。';
         status.hidden = false;
-        setSending(false);
       } finally {
+        // 成功・失敗どちらでも「送信中」を必ず解除する
         clearTimeout(timer);
+        setSending(false);
       }
     });
   }

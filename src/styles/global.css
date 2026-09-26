@@ -17,6 +17,11 @@
   box-sizing: border-box;
 }
 
+/* hidden属性は、display を指定したクラスより必ず優先して隠す */
+[hidden] {
+  display: none !important;
+}
+
 html {
   scroll-padding-top: env(safe-area-inset-top, 0px);
 }
