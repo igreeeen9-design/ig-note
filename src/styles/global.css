@@ -332,6 +332,35 @@ a:hover {
   margin-top: 10px;
 }
 
+.weather-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.weather-more {
+  color: var(--indigo);
+  font-size: 0.82rem;
+  text-decoration: none;
+}
+
+.weather-more:hover {
+  color: var(--stamp);
+  text-decoration: underline;
+}
+
+/* 外部サイトであることを示す小さなラベル */
+.weather-more-site {
+  margin-left: 0.6em;
+  padding: 0 6px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  font-size: 0.68rem;
+  color: var(--ink-soft);
+  vertical-align: 1px;
+}
+
 .weather-credit {
   font-size: 0.72rem;
   color: var(--ink-soft);
@@ -358,7 +387,6 @@ a:hover {
     padding: 12px 10px 10px;
   }
 
-  /* 狭い画面では天気名を省いてアイコンだけにする(名前はtitleで補う) */
   /* 折り返した行の先頭に区切りが来ないよう、スマホでは余白だけで区切る */
   .weather-summary-text {
     gap: 0 1em;
@@ -368,6 +396,7 @@ a:hover {
     content: none;
   }
 
+  /* 狭い画面では天気名を省いてアイコンだけにする(名前はtitleで補う) */
   .weather-hour {
     grid-template-columns: 2.6em 1.8em 3.2em 3.4em minmax(0, 1fr);
     gap: 8px;
