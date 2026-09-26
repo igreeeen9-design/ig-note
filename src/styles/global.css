@@ -467,6 +467,127 @@ a:hover {
   font-size: 0.92rem;
 }
 
+/* お問い合わせ */
+.contact-header {
+  padding: 40px 0 8px;
+}
+
+.contact-logo {
+  display: block;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 14px;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px var(--rule);
+}
+
+.contact-form {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.contact-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.contact-field label {
+  color: var(--heading);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.contact-required {
+  margin-left: 0.6em;
+  color: var(--stamp);
+  font-size: 0.72rem;
+}
+
+.contact-field input,
+.contact-field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  font: inherit;
+  /* 16px未満だとiPhoneで入力時に拡大されるため */
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.contact-field textarea {
+  resize: vertical;
+  min-height: 10em;
+}
+
+.contact-field input:focus,
+.contact-field textarea:focus {
+  outline: none;
+  border-color: var(--indigo);
+  box-shadow: 0 0 0 3px rgba(60, 96, 123, 0.15);
+}
+
+.contact-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.contact-status {
+  margin: 0;
+  color: var(--stamp);
+  font-size: 0.9rem;
+}
+
+.contact-submit {
+  align-self: flex-start;
+  padding: 10px 32px;
+  background-color: var(--heading);
+  border: none;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 500;
+  color: #fff;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.contact-submit:hover {
+  background-color: var(--indigo);
+}
+
+.contact-submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.contact-thanks {
+  margin-top: 24px;
+  padding: 20px;
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  color: var(--heading);
+  font-weight: 500;
+}
+
+.contact-thanks p {
+  margin: 0;
+}
+
+@media (max-width: 480px) {
+  .contact-submit {
+    align-self: stretch;
+  }
+}
+
 /* 記事一覧 */
 .post-list {
   list-style: none;

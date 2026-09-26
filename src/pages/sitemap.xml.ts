@@ -4,7 +4,7 @@ import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 
 // 記事・タグ以外の固定ページ(base path からの相対)
-const STATIC_PAGES = ['', 'blog/', 'photo/', 'about/'];
+const STATIC_PAGES = ['', 'blog/', 'photo/', 'about/', 'contact/'];
 
 export const GET: APIRoute = async ({ site }) => {
   const base = import.meta.env.BASE_URL;
