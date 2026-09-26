@@ -1,0 +1,214 @@
+---
+// トップページ用の福岡市の天気。
+// 静的サイトなので、ページを開いたときにブラウザからOpen-Meteo(APIキー不要)を取得して表示する。
+// 取得に失敗しても、この枠の中に短いメッセージが出るだけでページ全体には影響しない。
+---
+<section class="weather" aria-label="福岡市の天気">
+  <button
+    type="button"
+    class="weather-summary"
+    aria-expanded="false"
+    aria-controls="weather-detail"
+    disabled
+  >
+    <span class="weather-summary-text">天気を取得中…</span>
+    <span class="weather-toggle" aria-hidden="true"></span>
+  </button>
+
+  <div class="weather-detail" id="weather-detail" hidden>
+    <div class="weather-detail-head">
+      <p class="weather-detail-title">今日の福岡市の天気</p>
+      <p class="weather-updated"></p>
+    </div>
+    <dl class="weather-now"></dl>
+    <ol class="weather-hours" aria-label="3時間ごとの天気"></ol>
+    <div class="weather-detail-foot">
+      <a class="weather-credit" href="https://open-meteo.com/" target="_blank" rel="noopener">天気データ: Open-Meteo</a>
+      <button type="button" class="weather-close">閉じる</button>
+    </div>
+  </div>
+</section>
+
+<script>
+  // 福岡市役所付近
+  const LATITUDE = 33.5902;
+  const LONGITUDE = 130.4017;
+  const TIMEOUT_MS = 8000;
+
+  const API_URL =
+    'https://api.open-meteo.com/v1/forecast' +
+    `?latitude=${LATITUDE}&longitude=${LONGITUDE}` +
+    '&current=temperature_2m,weather_code,is_day,wind_speed_10m,wind_direction_10m' +
+    '&hourly=temperature_2m,weather_code,is_day,precipitation_probability,wind_speed_10m,wind_direction_10m' +
+    '&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max' +
+    '&timezone=Asia%2FTokyo&forecast_days=1&wind_speed_unit=ms';
+
+  // WMO天気コード → [絵文字, 日本語]
+  const WEATHER_CODES: Record<number, [string, string]> = {
+    0: ['☀️', '快晴'],
+    1: ['🌤️', '晴れ'],
+    2: ['⛅', '晴れ時々くもり'],
+    3: ['☁️', 'くもり'],
+    45: ['🌫️', '霧'],
+    48: ['🌫️', '霧'],
+    51: ['🌦️', '霧雨'],
+    53: ['🌦️', '霧雨'],
+    55: ['🌧️', '強い霧雨'],
+    56: ['🌧️', '冷たい霧雨'],
+    57: ['🌧️', '冷たい霧雨'],
+    61: ['🌧️', '小雨'],
+    63: ['🌧️', '雨'],
+    65: ['🌧️', '強い雨'],
+    66: ['🌧️', '冷たい雨'],
+    67: ['🌧️', '冷たい雨'],
+    71: ['🌨️', '小雪'],
+    73: ['🌨️', '雪'],
+    75: ['🌨️', '大雪'],
+    77: ['🌨️', '雪'],
+    80: ['🌦️', 'にわか雨'],
+    81: ['🌦️', 'にわか雨'],
+    82: ['🌧️', '激しいにわか雨'],
+    85: ['🌨️', 'にわか雪'],
+    86: ['🌨️', '強いにわか雪'],
+    95: ['⛈️', '雷雨'],
+    96: ['⛈️', '雷雨・ひょう'],
+    99: ['⛈️', '雷雨・ひょう'],
+  };
+
+  const WIND_DIRECTIONS = [
+    '北', '北北東', '北東', '東北東', '東', '東南東', '南東', '南南東',
+    '南', '南南西', '南西', '西南西', '西', '西北西', '北西', '北北西',
+  ];
+
+  function describeWeather(code: number, isDay: number): [string, string] {
+    const [icon, label] = WEATHER_CODES[code] ?? ['🌡️', '不明'];
+    // 夜の晴れに太陽マークが出ないようにする
+    if (!isDay && code <= 1) return ['🌙', label];
+    return [icon, label];
+  }
+
+  function windText(speed: number, direction: number): string {
+    const dir = WIND_DIRECTIONS[Math.round(direction / 22.5) % 16];
+    return `${dir} ${Math.round(speed)}m/s`;
+  }
+
+  const deg = (value: number) => `${Math.round(value)}℃`;
+
+  // "2026-09-26T09:45" → 9 / "9:45"(APIは福岡時間で返すので、端末のタイムゾーンに依存しない)
+  const hourOf = (time: string) => Number(time.slice(11, 13));
+  const clockOf = (time: string) => `${hourOf(time)}:${time.slice(14, 16)}`;
+
+  function el(tag: string, className: string, text?: string) {
+    const node = document.createElement(tag);
+    node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  async function fetchWeather() {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+    try {
+      const res = await fetch(API_URL, { signal: controller.signal, cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  function renderSummary(root: HTMLElement, data: any) {
+    const { current, daily } = data;
+    const [icon, label] = describeWeather(current.weather_code, current.is_day);
+    const text = root.querySelector('.weather-summary-text')!;
+    text.replaceChildren(
+      el('span', 'weather-place', '福岡市'),
+      el('span', 'weather-group', `${icon} ${deg(current.temperature_2m)}`),
+      el('span', 'weather-group', `最高${deg(daily.temperature_2m_max[0])} / 最低${deg(daily.temperature_2m_min[0])}`),
+      el('span', 'weather-group', `降水${daily.precipitation_probability_max[0] ?? '-'}%`),
+    );
+    text.firstElementChild!.nextElementSibling!.setAttribute('title', label);
+  }
+
+  function renderDetail(root: HTMLElement, data: any) {
+    const { current, hourly, daily } = data;
+    const [icon, label] = describeWeather(current.weather_code, current.is_day);
+
+    root.querySelector('.weather-updated')!.textContent = `${clockOf(current.time)} 時点`;
+
+    const now = root.querySelector('.weather-now')!;
+    const rows: [string, string][] = [
+      ['現在', `${icon} ${label} ${deg(current.temperature_2m)}`],
+      ['気温', `最高${deg(daily.temperature_2m_max[0])} / 最低${deg(daily.temperature_2m_min[0])}`],
+      ['降水確率', `最大${daily.precipitation_probability_max[0] ?? '-'}%`],
+      ['風', `${windText(current.wind_speed_10m, current.wind_direction_10m)}(最大${Math.round(daily.wind_speed_10m_max[0])}m/s)`],
+    ];
+    now.replaceChildren(
+      ...rows.map(([term, desc]) => {
+        const div = el('div', 'weather-now-row');
+        div.append(el('dt', '', term), el('dd', '', desc));
+        return div;
+      }),
+    );
+
+    // 3時間ごと(0時〜21時)。いまの時間帯には印を付ける。
+    const currentSlot = Math.floor(hourOf(current.time) / 3) * 3;
+    const list = root.querySelector('.weather-hours')!;
+    const header = el('li', 'weather-hour weather-hour--head');
+    header.setAttribute('aria-hidden', 'true');
+    ['時刻', '天気', '気温', '降水', '風'].forEach((t) => header.append(el('span', '', t)));
+    const items = [header];
+
+    (hourly.time as string[]).forEach((time, i) => {
+      const hour = hourOf(time);
+      if (hour % 3 !== 0) return;
+      const [hIcon, hLabel] = describeWeather(hourly.weather_code[i], hourly.is_day[i]);
+      const li = el('li', hour === currentSlot ? 'weather-hour is-now' : 'weather-hour');
+      const weather = el('span', 'weather-hour-weather');
+      weather.append(el('span', 'weather-hour-icon', hIcon), el('span', 'weather-hour-label', hLabel));
+      weather.setAttribute('title', hLabel);
+      li.append(
+        el('span', 'weather-hour-time', `${hour}時`),
+        weather,
+        el('span', 'weather-hour-temp', deg(hourly.temperature_2m[i])),
+        el('span', 'weather-hour-pop', `${hourly.precipitation_probability[i] ?? '-'}%`),
+        el('span', 'weather-hour-wind', windText(hourly.wind_speed_10m[i], hourly.wind_direction_10m[i])),
+      );
+      items.push(li);
+    });
+    list.replaceChildren(...items);
+  }
+
+  function setup(root: HTMLElement) {
+    const summary = root.querySelector<HTMLButtonElement>('.weather-summary')!;
+    const detail = root.querySelector<HTMLElement>('.weather-detail')!;
+    const close = root.querySelector<HTMLButtonElement>('.weather-close')!;
+
+    const setOpen = (open: boolean) => {
+      detail.hidden = !open;
+      summary.setAttribute('aria-expanded', String(open));
+      root.classList.toggle('is-open', open);
+    };
+
+    summary.addEventListener('click', () => setOpen(detail.hidden));
+    close.addEventListener('click', () => {
+      setOpen(false);
+      summary.focus();
+    });
+
+    fetchWeather()
+      .then((data) => {
+        renderSummary(root, data);
+        renderDetail(root, data);
+        summary.disabled = false;
+        root.classList.add('is-ready');
+      })
+      .catch(() => {
+        root.querySelector('.weather-summary-text')!.textContent = '天気を取得できませんでした';
+        root.classList.add('is-error');
+      });
+  }
+
+  const root = document.querySelector<HTMLElement>('.weather');
+  if (root) setup(root);
+</script>

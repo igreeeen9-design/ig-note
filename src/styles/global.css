@@ -131,6 +131,243 @@ a:hover {
   display: block;
 }
 
+/* トップページ: 天気 */
+.weather {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.weather-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  font: inherit;
+  font-weight: 500;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.weather-summary:disabled {
+  cursor: default;
+}
+
+.weather-summary:not(:disabled):hover {
+  border-color: var(--blue-accent);
+}
+
+.weather-summary-text {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.6em;
+  line-height: 1.7;
+}
+
+.weather-place {
+  color: var(--heading);
+  font-weight: 700;
+  margin-right: 0.2em;
+}
+
+.weather-group {
+  white-space: nowrap;
+}
+
+/* 項目の間の区切り「｜」 */
+.weather-group + .weather-group::before {
+  content: '｜';
+  margin-right: 0.6em;
+  color: var(--rule);
+}
+
+.weather-toggle {
+  display: none;
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid var(--heading);
+  border-bottom: 1.5px solid var(--heading);
+  transform: translateY(-2px) rotate(45deg);
+}
+
+.weather.is-ready .weather-toggle {
+  display: block;
+}
+
+.weather.is-open .weather-toggle {
+  transform: translateY(2px) rotate(225deg);
+}
+
+.weather.is-error .weather-summary {
+  background: none;
+  border-style: dashed;
+}
+
+.weather-detail {
+  margin-top: 6px;
+  padding: 14px 16px 12px;
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+}
+
+.weather-detail-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0 12px;
+}
+
+.weather-detail-title {
+  margin: 0;
+  color: var(--heading);
+  font-weight: 700;
+}
+
+.weather-updated {
+  margin: 0;
+  font-size: 0.78rem;
+}
+
+.weather-now {
+  margin: 8px 0 0;
+}
+
+.weather-now-row {
+  display: flex;
+  gap: 12px;
+}
+
+.weather-now dt {
+  flex: none;
+  width: 5em;
+  color: var(--heading);
+}
+
+.weather-now dd {
+  margin: 0;
+}
+
+.weather-hours {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  border-top: 1px solid var(--rule);
+}
+
+.weather-hour {
+  display: grid;
+  grid-template-columns: 3em minmax(0, 1fr) 3.5em 3.5em 6.5em;
+  gap: 8px;
+  align-items: center;
+  padding: 5px 4px;
+  border-bottom: 1px solid var(--rule);
+  font-variant-numeric: tabular-nums;
+}
+
+.weather-hour--head {
+  white-space: nowrap;
+  padding-top: 6px;
+  padding-bottom: 3px;
+}
+
+/* 列幅(em)は本体の行と揃えたまま、見出しの文字だけ小さくする */
+.weather-hour--head span {
+  font-size: 0.72rem;
+}
+
+.weather-hour-temp,
+.weather-hour-pop,
+.weather-hour--head span:nth-child(3),
+.weather-hour--head span:nth-child(4) {
+  text-align: right;
+}
+
+.weather-hour-weather {
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+}
+
+.weather-hour-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.weather-hour.is-now {
+  background-color: var(--paper);
+  color: var(--heading);
+  font-weight: 700;
+}
+
+.weather-detail-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.weather-credit {
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+}
+
+.weather-close {
+  padding: 3px 14px;
+  background: none;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.weather-close:hover {
+  color: var(--heading);
+  border-color: var(--heading);
+}
+
+@media (max-width: 480px) {
+  .weather-detail {
+    padding: 12px 10px 10px;
+  }
+
+  /* 狭い画面では天気名を省いてアイコンだけにする(名前はtitleで補う) */
+  /* 折り返した行の先頭に区切りが来ないよう、スマホでは余白だけで区切る */
+  .weather-summary-text {
+    gap: 0 1em;
+  }
+
+  .weather-group + .weather-group::before {
+    content: none;
+  }
+
+  .weather-hour {
+    grid-template-columns: 2.6em 1.8em 3.2em 3.4em minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .weather-hour-wind {
+    white-space: nowrap;
+  }
+
+  .weather-hour-label {
+    display: none;
+  }
+}
+
 /* トップページ: イントロ */
 .intro {
   margin: 8px 0 0;

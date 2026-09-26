@@ -22,6 +22,8 @@ self.addEventListener('activate', (event) => {
 // 一度開いたページは電波が悪い場所でも読める。
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  // 天気は「いま」の情報なので、キャッシュせず毎回取りに行く(古い天気を出さない)
+  if (new URL(event.request.url).hostname === 'api.open-meteo.com') return;
 
   event.respondWith(
     fetch(event.request)
