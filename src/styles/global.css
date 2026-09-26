@@ -253,15 +253,13 @@ a:hover {
   color: var(--heading);
 }
 
-.weather-now dd {
-  margin: 0;
-}
-
 .weather-tomorrow {
   margin-top: 10px;
 }
 
-.weather-tomorrow dd {
+/* 項目を並べる行(降水確率+降水量、明日の天気)は、項目単位で折り返す */
+.weather-now dd {
+  margin: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 0 1em;
