@@ -34,7 +34,12 @@ const dateLabel = post.data.date.toLocaleDateString('ja-JP', {
   day: 'numeric',
 });
 ---
-<BaseLayout title={`${post.data.title} - DEKIRUKANA.`} description={post.data.excerpt}>
+<BaseLayout
+  title={`${post.data.title} - DEKIRUKANA.`}
+  description={post.data.description ?? post.data.excerpt}
+  image={post.data.cover}
+  type="article"
+>
   <article>
     <header class="post-header">
       <p class="post-date">{dateLabel}</p>

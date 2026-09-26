@@ -6,6 +6,8 @@ const posts = defineCollection({
     title: z.string(),
     date: z.coerce.date(),
     excerpt: z.string().optional(),
+    // 検索結果用の説明文(任意)。なければ excerpt を使う
+    description: z.string().optional(),
     cover: z.string().optional(),
     tags: z.array(z.string()).default([]),
     draft: z.boolean().default(false),
