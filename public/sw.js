@@ -22,8 +22,11 @@ self.addEventListener('activate', (event) => {
 // 一度開いたページは電波が悪い場所でも読める。
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  const { hostname } = new URL(event.request.url);
   // 天気は「いま」の情報なので、キャッシュせず毎回取りに行く(古い天気を出さない)
-  if (new URL(event.request.url).hostname === 'api.open-meteo.com') return;
+  if (hostname === 'api.open-meteo.com') return;
+  // アクセス解析(GoatCounter)の計測スクリプトと送信はキャッシュしない
+  if (hostname === 'gc.zgo.at' || hostname === 'dekirukana.goatcounter.com') return;
 
   event.respondWith(
     fetch(event.request)

@@ -45,5 +45,22 @@ const {
         });
       }
     </script>
+    <!--
+      アクセス解析: GoatCounter(DEKIRUKANA.専用サイト dekirukana)。フルフェイスとは別集計。
+      公開ページはすべてこのレイアウトを通るので、ここ1か所だけに置く(二重計測しない)。
+      管理画面(public/admin/)はこのレイアウトを使わないため計測されないが、
+      念のため /ig-note/admin/ 配下では送信しない。localhostでの閲覧はcount.js側で計測されない。
+    -->
+    <script define:vars={{ base: import.meta.env.BASE_URL }}>
+      window.goatcounter = {
+        path: (path) => (path.startsWith(`${base}admin/`) ? null : path),
+      };
+    </script>
+    <script
+      is:inline
+      data-goatcounter="https://dekirukana.goatcounter.com/count"
+      async
+      src="https://gc.zgo.at/count.js"
+    ></script>
   </body>
 </html>
