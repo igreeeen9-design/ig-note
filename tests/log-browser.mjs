@@ -2,8 +2,10 @@
 // PLAYWRIGHT_MODULE=/absolute/path/to/playwright/index.mjs node tests/log-browser.mjs
 // ローカルAstroサーバーが必要。GitHub通信はすべてモックし、実データは変更しない。
 import assert from 'node:assert/strict';
-import { readFile, mkdir } from 'node:fs/promises';
+import { readFile, readdir, mkdir } from 'node:fs/promises';
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const logData = await Promise.all((await readdir('src/content/logs')).filter((name) => name.endsWith('.json')).map(async (name) => JSON.parse(await readFile(`src/content/logs/${name}`, 'utf8'))));
+const expectedLatestCount = Math.min(3, logData.filter((log) => !log.draft).length);
 const browser = await chromium.launch({ headless:true, ...(process.env.CHROME_PATH ? { executablePath:process.env.CHROME_PATH } : {}) });
 const base = process.env.TEST_BASE_URL || 'http://127.0.0.1:4321/ig-note/';
 const shots = process.env.TEST_SCREENSHOTS || '/tmp/dekirukana-log-check';
@@ -56,9 +58,9 @@ try {
       assert.equal(await page.locator('.site-footer a').getAttribute('href'),'/ig-note/contact/');
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),`${path} overflow at ${width}`);
       if (path==='log/') {
-        assert.equal(await page.locator('.log-body').innerText(),initial.body);
-        assert.equal(await page.locator('.log-body').evaluate((el)=>getComputedStyle(el).whiteSpace),'pre-wrap');
-        assert.equal(await page.locator('.log-photo').count(),0);
+        assert.equal(await page.locator('#log-20261010-hakata .log-body').innerText(),initial.body);
+        assert.equal(await page.locator('#log-20261010-hakata .log-body').evaluate((el)=>getComputedStyle(el).whiteSpace),'pre-wrap');
+        assert.equal(await page.locator('#log-20261010-hakata .log-photo').count(),0);
         await page.screenshot({path:`${shots}/log-${width}.png`,fullPage:true});
       }
       if (!path) {
@@ -71,9 +73,10 @@ try {
           return latest.getBoundingClientRect().top - intro.getBoundingClientRect().bottom;
         });
         assert.ok(gap >= 24 && gap <= 48, `Unexpected intro/LATEST LOG gap: ${gap}`);
-        assert.equal(await page.locator('.latest-logs li').count(),1);
+        assert.equal(await page.locator('#latest-log-heading').innerText(), 'LOG');
+        assert.equal(await page.locator('.latest-logs li').count(), expectedLatestCount);
         assert.ok((await page.locator('.latest-logs').innerText()).includes('10.10'));
-        const href = await page.locator('.latest-logs a').getAttribute('href');
+        const href = await page.locator('.latest-logs a').first().getAttribute('href');
         assert.ok(href.includes('log/#log-'));
         await page.screenshot({path:`${shots}/home-${width}.png`,fullPage:true});
       }

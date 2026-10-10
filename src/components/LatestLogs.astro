@@ -5,7 +5,7 @@ const logs = publishedLogs(await getCollection('logs')).slice(0, 3);
 const base = import.meta.env.BASE_URL;
 ---
 <section aria-labelledby="latest-log-heading">
-  <h2 id="latest-log-heading" class="section-label">LATEST LOG</h2>
+  <h2 id="latest-log-heading" class="section-label">LOG</h2>
   {logs.length ? <ul class="latest-logs">
     {logs.map((log) => <li><a href={`${base}log/#log-${log.id}`}>
       <time datetime={log.data.date}>{log.data.date.slice(5).replace('-', '.')}</time>
