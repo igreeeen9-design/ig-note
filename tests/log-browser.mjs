@@ -21,7 +21,6 @@ try {
   const seed = (path, content) => files.set(path, {sha:String(++seq), content:Buffer.from(content).toString('base64')});
   seed('src/content/logs/20261010-hakata.json', JSON.stringify(initial));
   seed('src/content/posts/test.md', '---\ntitle: "既存記事"\ndate: 2026-10-10\ndraft: false\ntags: []\nfeatured: false\n---\n\n既存の本文。\n');
-  seed('src/data/now.txt', 'テスト中');
   await context.route('**/*', async (route) => {
     const url = new URL(route.request().url());
     if (url.hostname === 'api.github.com') {
@@ -88,6 +87,7 @@ try {
   await page.locator('#token-input').fill('test-only-token');
   await page.locator('#save-token-btn').click();
   await page.locator('#post-list a').waitFor();
+  assert.equal(await page.getByRole('link', {name:'NOWを編集', exact:true}).count(), 0);
   await page.getByRole('link', {name:'LOG', exact:true}).click();
   await page.locator('#logs a').waitFor();
   await page.getByRole('link',{name:'＋ 新しいLOGを書く'}).click();

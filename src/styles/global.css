@@ -465,7 +465,7 @@ a:hover {
   margin-top: 8px;
 }
 
-/* トップページ: NOW / ABOUT など短文セクション共通 */
+/* ABOUTなど短文セクション共通 */
 .section-text {
   margin: 8px 0 0;
   color: var(--ink-soft);
