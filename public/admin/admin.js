@@ -54,6 +54,10 @@ async function gh(path, opts = {}) {
   return res.json();
 }
 
+export async function listDirectory(path) {
+  return gh(`/repos/${OWNER}/${REPO}/contents/${path}?ref=${BRANCH}`);
+}
+
 export async function listPosts() {
   const items = await gh(`/repos/${OWNER}/${REPO}/contents/${POSTS_DIR}?ref=${BRANCH}`);
   const files = items.filter((it) => it.type === 'file' && it.name.endsWith('.md'));

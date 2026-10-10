@@ -1,0 +1,23 @@
+---
+import { getCollection } from 'astro:content';
+import { publishedLogs, logExcerpt } from '../../public/admin/log-data.js';
+const logs = publishedLogs(await getCollection('logs')).slice(0, 3);
+const base = import.meta.env.BASE_URL;
+---
+<section aria-labelledby="latest-log-heading">
+  <h2 id="latest-log-heading" class="section-label">LATEST LOG</h2>
+  {logs.length ? <ul class="latest-logs">
+    {logs.map((log) => <li><a href={`${base}log/#log-${log.id}`}>
+      <time datetime={log.data.date}>{log.data.date.slice(5).replace('-', '.')}</time>
+      <span>{logExcerpt(log.data.body)}</span>
+    </a></li>)}
+  </ul> : <p class="section-text">まだ記録はありません。</p>}
+  <a class="view-all" href={`${base}log/`}>VIEW ALL →</a>
+</section>
+<style>
+  .latest-logs { list-style: none; padding: 0; margin: 8px 0; }
+  .latest-logs a { display: grid; grid-template-columns: 3.4em minmax(0, 1fr); gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: .88rem; text-decoration: none; }
+  time { font-variant-numeric: tabular-nums; color: var(--ink-soft); }
+  .latest-logs span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .view-all { display: inline-block; padding: 8px 0; font-size: .75rem; letter-spacing: .08em; }
+</style>

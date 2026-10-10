@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>LOG編集 - 管理画面</title>
+  <link rel="stylesheet" href="./admin.css" />
+</head>
+<body><div class="wrap">
+  <div class="topbar"><a class="back" href="./logs.html">← LOG一覧</a><h1>LOGを書く</h1><span id="badge" class="badge draft">下書き</span></div>
+  <p id="status" class="status" role="status" aria-live="polite">読み込み中…</p>
+  <form id="editor" class="log-editor" hidden>
+    <fieldset id="fields">
+      <div class="field"><label for="date">日付（必須）</label><input id="date" type="date" required /></div>
+      <div class="field"><label for="body">本文（必須）</label><textarea id="body" rows="6" required placeholder="今日の出来事や、ふと思ったことを。"></textarea><p class="field-hint">2〜5行くらいでも、もう少し長くても。改行はそのまま表示されます。</p></div>
+      <div class="field"><label for="photo">写真（任意・1枚）</label><input id="photo" type="file" accept="image/*" /><p class="field-hint">写真は保存時に縮小・圧縮して追加します。</p><img id="preview" class="log-photo-preview" alt="選択した写真" hidden /><button id="remove-photo" class="btn" type="button" hidden>写真を外す</button></div>
+      <div class="log-actions">
+        <button id="save-draft" type="button" class="btn">下書き保存</button>
+        <button id="publish" type="submit" class="btn primary">公開する</button>
+        <button id="unpublish" type="button" class="btn" hidden>下書きに戻す</button>
+        <button id="delete" type="button" class="btn danger" hidden>削除</button>
+      </div>
+    </fieldset>
+  </form>
+</div><script type="module" src="./log-editor.js"></script></body></html>

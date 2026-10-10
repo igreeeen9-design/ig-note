@@ -1,4 +1,5 @@
 import { defineCollection, z } from 'astro:content';
+import { isLogDate, isLogPhoto } from '../../public/admin/log-data.js';
 
 const posts = defineCollection({
   type: 'content',
@@ -15,4 +16,14 @@ const posts = defineCollection({
   }),
 });
 
-export const collections = { posts };
+const logs = defineCollection({
+  type: 'data',
+  schema: z.object({
+    date: z.string().refine(isLogDate, '日付はYYYY-MM-DDで指定してください'),
+    body: z.string().trim().min(1),
+    photo: z.string().refine(isLogPhoto, '写真はuploads内の画像を指定してください').optional(),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { posts, logs };
