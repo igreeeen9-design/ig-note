@@ -62,6 +62,15 @@ try {
         await page.screenshot({path:`${shots}/log-${width}.png`,fullPage:true});
       }
       if (!path) {
+        assert.equal(await page.locator('main .now').count(), 0);
+        assert.ok(!(await page.locator('main .section-label').allTextContents()).includes('NOW'));
+        const gap = await page.evaluate(() => {
+          const intro = document.querySelector('.intro');
+          const latest = document.querySelector('#latest-log-heading');
+          if (intro.nextElementSibling !== latest.closest('section')) return -1;
+          return latest.getBoundingClientRect().top - intro.getBoundingClientRect().bottom;
+        });
+        assert.ok(gap >= 24 && gap <= 48, `Unexpected intro/LATEST LOG gap: ${gap}`);
         assert.equal(await page.locator('.latest-logs li').count(),1);
         assert.ok((await page.locator('.latest-logs').innerText()).includes('10.10'));
         const href = await page.locator('.latest-logs a').getAttribute('href');
